@@ -1,0 +1,90 @@
+import "pft_temp.ins"
+
+!searchradius 10
+!searchradius_soil 0.25
+
+temp_change 0
+prec_change 0
+insol_change 0
+ndep_change 0
+ph_change 0 
+co2_change 0
+
+
+param "file_gridlist" (str "/home/johannes/crop_ncep/data/Johannes/gridlist_hurtt_RNDM_cf.txt")
+
+param "file_disturbance" (str "")
+param "file_disturbance_st" (str "")
+param "file_windload"   (str "")
+  
+
+param "file_co2"      (str "/home/johannes/crop_ncep/data/Johannes/Data/cmip5_rec_co2_rcp4p5_1901_2100.txt")
+param "file_cru"      (str "/home/johannes/crop_ncep/data/Johannes/Data/Cruncep_1901_2015.bin")
+param "file_cru_misc" (str "/home/johannes/crop_ncep/data/Johannes/Data/Cruncep_1901_2015misc.bin")
+
+param "file_soildata" (str "/home/johannes/crop_ncep/data/Johannes/Data/soilmap_center_interpolated.dat")
+
+! N deposition (blank string to use constant pre-industrial level of 2 kgN/ha/year)
+
+param "file_ndep" (str "/home/johannes/crop_ncep/data/Johannes/Data/GlobalNitrogenDeposition.bin")
+
+ndep_timeseries  "RCP45" ! RCP26 RCP45 RCP60 RCP85
+
+param "file_gridlist_cf" (str "")
+
+param "file_temp" (str "/home/johannes/crop_ncep/data/Johannes/Data/tas_bced_1960_1999_ipsl-cm5a-lr_hist_rcp8p5_1901-2099_noleap_monmean_chunked_rew.nc")
+param "variable_temp" (str "tasAdjust")
+
+
+param "file_prec"     (str "/home/johannes/crop_ncep/data/Johannes/Data/pr_bced_1960_1999_ipsl-cm5a-lr_hist_rcp8p5_1901-2099_noleap_monmean_chunked_rew.nc")
+param "variable_prec" (str "prAdjust")
+
+param "file_insol"      (str "/home/johannes/crop_ncep/data/Johannes/Data/rsds_bced_1960_1999_ipsl-cm5a-lr_hist_rcp8p5_1901-2099_noleap_monmean_chunked_rew.nc")
+param "variable_insol"  (str "rsdsAdjust")
+
+! Wet days can only be used with monthly precipitation
+
+param "file_wetdays"     (str "/home/johannes/crop_ncep/data/Johannes/Data/wetday_bced_1960_1999_ipsl-cm5a-lr_hist_rcp8p5_1901-2099_noleap_pd1.0_monsum_chunked_rew.nc")
+param "variable_wetdays" (str "precipitation_days_index_per_time_period")
+
+! Min/max temp is required for BVOC,
+
+param "file_min_temp"      (str "")
+param "variable_min_temp"  (str "tasminAdjust")
+
+param "file_max_temp"      (str "")
+param "variable_max_temp"  (str "tasmaxAdjust")
+
+
+param "file_pres" (str "")
+param "file_specifichum" (str "")
+param "file_wind" (str "")
+param "file_relhum" (str "")
+param "file_popdens" (str "")
+param "file_mndrydep" (str "")
+param "file_mnwetdep" (str "")
+
+
+param "file_lu"      (str "")
+param "file_lucrop"  (str "")
+param "file_lupasture"  (str "")
+param "file_lunatural"  (str "")
+param "file_luforest"  (str "")
+param "file_woodharv_frac"      (str "")
+param "file_woodharv_vol"      (str "")
+
+
+! Crop management input files
+
+param "file_sdates" (str "")
+param "file_hdates" (str "")
+param "file_Nfert" (str "")
+
+
+
+param "file_woodharv_frac"      (str "")
+param "file_woodharv_cmass"      (str "")  
+
+
+param "file_Nfert_st"   (str "")
+param "file_cutinterval_st"   (str "")
