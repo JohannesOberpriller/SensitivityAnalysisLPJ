@@ -1,0 +1,83 @@
+Übergruppe,Parameter ,Erklärung ,Einheit,Default,Minimum Value,Maximum Value
+Common Paramaters,,,,,,
+Photosynthesis,lambda_max,Non-water-stressed ratio of intercellular to ambient CO2 pp,einheitenlos?,"0,8",0.6,0.8
+Water,emax,Maximum evapotranspiration rate ,(mm/day),5,2,6
+Establishment,reprfrac,Fraction of NPP allocated to reproduction,einheitenlos,"0,1",0.05,0.3
+Nitrogen fixation,nfix_a,First term in N fixation eqn,einheitenlos?,"0,102",0.102,0.367
+Nitrogen fixation,nfix_b,Second term in N fixation eqn,einheitenlos?,"0,524","-0,754",0.524
+Nitrogen fixation,nrelocfrac,Fraction of N retranslocated prior to leaf and root shedding,einheitenlos,"0,5",0.1,0.8
+Wachstum,turnover_root,Fine root turnover ,(fraction/year),"0,7",0.65,0.75
+Störungen,distinterval,average return time for generic patch-destroying disturbances,years ,920,200,1000
+Wachstum,crownarea_max,maximum crown area,mm^2,40,20,60
+Wachstum,k_allom2,height =kallom2* _x005F_x0006_diameter ^{kallom3},einheitenlos,60,30,80
+Wachstum,k_rp,crown area = kallom1_x005F_x0006_*height^{k_rp},einheitenlos,"1,6",1.3,1.6
+Speciesspecific,,,,,,
+Pinus sylvestris,,,,,,
+Mortality,longetivity,Expected longevity under lifetime non-stressed conditions (yr),years,500,300,900
+Konkurrenz,leaflong,Leaf longevity ,years,4,2.5,7
+Störung,fireresist,fire resistance,einheitenlos,"0,4",0.05,0.7
+Water,gmin,minimum canopy conductance not assoc with photosynthesis,mm/s,"0,3",0.22,0.38
+Konkurrenz,sla,Specific leaf area ,m^2/kgC,"8,56",7.812,9.3
+Establishment,est_max,Max sapling establishment rate ,(indiv/m2/year),"0,2",0.1,0.25
+Wachstum,turnover_sap,sapwood turnover rate,fraction/year,"0,085",0.05,0.1
+Establishment,alphar,Shape parameter for recruitment-juv growth rate relationship,einheitenlos,10,4,15
+Water,respocoeff,Respiration coefficient,einheitenlos,1,0.8,2.2
+Photosynthesis,pstemp_low,Approx lower range of temp optimum for photosynthesis ,(deg C),10,7,15
+Photosynthesis,pstemp_high,Approx higher range of temp optimum for photosynthesis (deg C),(deg C),25,15,30
+Mortality,greff_min,Threshold for growth suppression mortality ,kgC/m2 leaf/yr,"0,21",0.07,0.26
+Wachstum,k_latosa,Tree leaf to sapwood xs area ratio,einheitenlos,3000,1800,5200
+Störung ,cutinterval,Time until trees are cut,years,90,40,140
+Störung ,thinning_intensity,percentage of treshold crowncoverage that is kept after thinning,einheitenlos,"0,9",0.45,1
+Water ,drought_tolerance ,"(0 = very -> 1 = not at all, Used to implement drought-limited establishment plus wauptake if wateruptake == SPECIESSPECIFIC)",einheitenlos,"0,25",0.1,0.4
+Wachstum,k_allom2,height =kallom2* _x005F_x0006_diameter ^{kallom3},einheitenlos,30,15,60
+Establishment,parff_min,Min forest floor PAR for grass growth/tree estab ,J/m2/day,2500000,1500000,3500000
+Wachstum,k_chillb,Coefficient in equation for budburst chilling time requirement,einheitenlos,100,80,800
+Bioclimatic Limit ,gdd5min_est ,Min GDD on 5 deg C base for establishment,(deg C) Days,500,250,700
+Bioclimatic Limit ,tcmin_est,Min 20-year coldest month mean temp for establishment ,(deg C),-29,-100,-15
+Bioclimatic Limit ,tcmax_est,Max 20-year coldest month mean temp for establishment,(deg C),5.5,-1.0 ,6
+Picea abies,,,,,,
+Mortality,longetivity,Expected longevity under lifetime non-stressed conditions (yr),years,300,200,1000
+Konkurrenz,leaflong,Leaf longevity ,years,7,4,10
+Störung,fireresist,fire resistance,einheitenlos,"0,1",0.05,0.8
+Water,gmin,minimum canopy conductance not assoc with photosynthesis,mm/s,"0,3",0.22,0.38
+Konkurrenz,sla,Specific leaf area ,m^2/kgC,"11,52",8.7,15.1
+Establishment,est_max,Max sapling establishment rate ,(indiv/m2/year),"0,1",0.05,0.2
+Wachstum,turnover_sap,sapwood turnover rate,fraction/year,"0,065",0.04,0.09
+Establishment,alphar,Shape parameter for recruitment-juv growth rate relationship,einheitenlos,"2,0",2,5
+Water,respcoeff,Respiration coefficient,einheitenlos,"1,0",0.8,2.2
+Photosynthesis,pstemp_low,Approx lower range of temp optimum for photosynthesis ,(deg C),10,6.5,13
+Photosynthesis,pstemp_high,Approx higher range of temp optimum for photosynthesis (deg C),(deg C),25,17,30
+Mortality,greff_min,Threshold for growth suppression mortality ,kgC/m2 leaf/yr,"0,135",0.03,0.19
+Wachstum,k_latosa,Tree leaf to sapwood xs area ratio,einheitenlos,4000,2500,7000
+Störung ,cutinterval,Time until trees are cut,years,90,60,120
+Störung ,thinning_intensity,percentage of treshold crowncoverage that is kept after thinning,einheitenlos,"0,9",0.5,1
+Water ,drought_tolerance ,"(0 = very -> 1 = not at all, Used to implement drought-limited establishment plus wauptake if wateruptake == SPECIESSPECIFIC)",einheitenlos,"0,48",0.2,0.65
+Wachstum,k_allom2,height =kallom2* _x005F_x0006_diameter ^{kallom3},einheitenlos,siehe allgemein,,
+Establishment,parff_min,Min forest floor PAR for grass growth/tree estab ,J/m2/day,1000000,750000,1600000
+Wachstum,k_chillb,Coefficient in equation for budburst chilling time requirement,einheitenlos,100,80,800
+Bioclimatic Limit ,gdd5min_est ,Min GDD on 5 deg C base for establishment,(deg C) Days,350,300,700
+Bioclimatic Limit ,tcmin_est,Min 20-year coldest month mean temp for establishment ,(deg C),-29,-100,-15
+Bioclimatic Limit ,tcmax_est,Max 20-year coldest month mean temp for establishment,(deg C),3,-2,6
+Fagus sylvatica ,,,,,,
+Mortality,longetivity,Expected longevity under lifetime non-stressed conditions (yr),years,400,250,650
+Konkurrenz,leaflong,Leaf longevity ,years,"0,5",0.4,0.8
+Störung,fireresist,fire resistance,einheitenlos,"0,1",0.05,0.8
+Water,gmin,minimum canopy conductance not assoc with photosynthesis,mm/s,"0,5",0.42,0.58
+Konkurrenz,sla,Specific leaf area ,m^2/kgC,"43,08",28.33,48.23
+Establishment,est_max,Max sapling establishment rate ,(indiv/m2/year),"0,2",0.05,0.25
+Wachstum,turnover_sap,sapwood turnover rate,fraction/year,"0,085",0.05,0.1
+Establishment,alphar,Shape parameter for recruitment-juv growth rate relationship,einheitenlos,"2,0",0.8,5
+Water,respcoeff,Respiration coefficient,einheitenlos,"1,0",0.5,1.5
+Photosynthesis,pstemp_low,Approx lower range of temp optimum for photosynthesis ,(deg C),15,8,20
+Photosynthesis,pstemp_high,Approx higher range of temp optimum for photosynthesis (deg C),(deg C),25,20,30
+Mortality,greff_min,Threshold for growth suppression mortality ,kgC/m2 leaf/yr,"0,02",0.001,0.13
+Wachstum,k_latosa,Tree leaf to sapwood xs area ratio,einheitenlos,5000,2500,8000
+Störung ,cutinterval,Time until trees are cut,years,105,80,140
+Störung ,thinning_intensity,percentage of treshold crowncoverage that is kept after thinning,einheitenlos,"0,9",0.55,1
+Water ,drought_tolerance ,"(0 = very -> 1 = not at all, Used to implement drought-limited establishment plus wauptake if wateruptake == SPECIESSPECIFIC)",einheitenlos,"0,39",0.2,0.49
+Wachstum,k_allom2,height =kallom2* _x005F_x0006_diameter ^{kallom3},einheitenlos,siehe allgemein,,
+Establishment,parff_min,Min forest floor PAR for grass growth/tree estab ,J/m2/day,1000000,100000,1600000
+Wachstum,k_chillb,Coefficient in equation for budburst chilling time requirement,einheitenlos,600,250,800
+Bioclimatic Limit ,gdd5min_est ,Min GDD on 5 deg C base for establishment,(deg C) Days,1300,1050,1450
+Bioclimatic Limit ,tcmin_est,Min 20-year coldest month mean temp for establishment ,(deg C),-6.5 ,-8,-5
+Bioclimatic Limit ,tcmax_est,Max 20-year coldest month mean temp for establishment,(deg C),7,5,8

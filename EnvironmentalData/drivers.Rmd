@@ -1,0 +1,381 @@
+---
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+library(stargazer)
+```
+
+```{r echo=FALSE}
+climaticranges <- readRDS("climateranges_list.rds")
+
+
+mean_ranges = matrix(nrow = 2, ncol = 6)
+colnames(mean_ranges) = names(climaticranges)
+rownames(mean_ranges) = c("Minimum","Maximum")
+for(i in 1:length(climaticranges)){
+  mean_ranges[1,i]= mean(climaticranges[[i]][1,])
+  mean_ranges[2,i]=mean(climaticranges[[i]][2,])
+}
+
+absolut_ranges = mean_ranges[2,] - mean_ranges[1,]
+
+absolut_ranges = absolut_ranges[c(2,1,6,4,5,3)]
+
+rescaling <- function(x) {(x-min(x))/(max(x)-min(x))}
+
+rescaling_abs <- function(x) {abs(x)/max(abs(x))}
+
+remap_paramters <- function(parameters, weighting_scheme, position_scheme){
+  mapped_parameters = matrix(ncol = length(weighting_scheme),
+                             nrow = nrow(parameters))
+  for(site in 1:nrow(parameters)){
+    for(parameter in 1:length(position_scheme)){
+      mapped_parameters[site,parameter] = sum(abs(parameters[site,position_scheme[[parameter]]])*
+                                                weighting_scheme[[parameter]])
+    }
+  }
+  return(mapped_parameters)
+}
+
+
+remap_paramters_rel <- function(parameters, weighting_scheme, position_scheme){
+  mapped_parameters = matrix(ncol = length(weighting_scheme),
+                             nrow = nrow(parameters))
+  for(site in 1:nrow(parameters)){
+    for(parameter in 1:length(position_scheme)){
+      mapped_parameters[site,parameter] = sum(parameters[site,position_scheme[[parameter]]]*
+                                                weighting_scheme[[parameter]])
+    }
+  }
+  return(mapped_parameters)
+}
+
+
+get_sensitivities <- function(uncertainty_estimates, climaticranges, species , parameter_ranges_list,
+                              parameternames_ordered, driver_parameters){
+  for(i in driver_parameters){
+    if(parameternames_ordered[i] == "ph" | parameternames_ordered[i] == "co2"){
+      uncertainty_estimates[,i] = uncertainty_estimates[,i]/
+        (climaticranges[[parameternames_ordered[i]]][2,] - climaticranges[[parameternames_ordered[i]]][1,])
+    }
+    else{
+      for(site in 1:200){
+        uncertainty_estimates[site,i] = uncertainty_estimates[site,i]/
+          (climaticranges[[parameternames_ordered[i]]][2,site] - climaticranges[[parameternames_ordered[i]]][1,site])
+      }
+    }
+  }
+
+  for(i in 1:38){
+    if( i %in% driver_parameters){
+      uncertainty_estimates[,i] = uncertainty_estimates[,i]
+    }
+    else{
+      parameter_position = match(parameternames_ordered[i],parameter_ranges_list[[species]][,1])
+      uncertainty_estimates[,i] = uncertainty_estimates[,i] /
+        (as.numeric(parameter_ranges_list[[species]][parameter_position,4])- as.numeric(parameter_ranges_list[[species]][parameter_position,3]))
+    }
+  }
+  return(uncertainty_estimates)
+}
+
+
+
+
+
+## getting the ordered parameter names ##
+
+parameters = readRDS("Parameter_list.rds")
+drivernames  = paste0("run_",c("co2","ndep","insol","temp","ph","prec"),"_change")
+parameters_pic_abi = c(as.character(parameters$Pic_abi$NameRLPJ), drivernames)
+parameters_fag_syl = c(as.character(parameters$Fag_syl$NameRLPJ), drivernames)
+parameters_pin_syl = c(as.character(parameters$Pin_syl$NameRLPJ), drivernames)
+
+results =  readRDS(paste0("./LPJrunTest/Results/Pic_abi_0.25_42.25.rds"))
+parameternames_ordered_pic_abi = names(results$parameters[[1]][which(names(results$parameters[[1]]) %in% parameters_pic_abi)])
+
+results =  readRDS(paste0("./LPJrunTest/Results/Fag_syl_0.25_42.25.rds"))
+parameternames_ordered_fag_syl = names(results$parameters[[1]][which(names(results$parameters[[1]]) %in% parameters_fag_syl)])
+
+results =  readRDS(paste0("./LPJrunTest/Results/Pin_syl_0.25_42.25.rds"))
+parameternames_ordered_pin_syl = names(results$parameters[[1]][which(names(results$parameters[[1]]) %in% parameters_pin_syl)])
+
+mixed_results = readRDS("./LPJrunTest/Results/mapping_mixed.rds")
+
+
+parameternames_ordered_pic_abi2 = substring(parameternames_ordered_pic_abi,regexpr("_", parameternames_ordered_pic_abi) + 1)
+parameternames_ordered_fag_syl2 = substring(parameternames_ordered_fag_syl,regexpr("_", parameternames_ordered_fag_syl) + 1)
+parameternames_ordered_pin_syl2 = substring(parameternames_ordered_pin_syl,regexpr("_", parameternames_ordered_pin_syl) + 1)
+parameternames_ordered_mixed2 = mixed_results$parameternames
+noisy_things = c("intolerant","tolerant","tree","abi","change","_","syl","leaved")
+for(i in 1:length(noisy_things)){
+  parameternames_ordered_pic_abi2 = gsub(noisy_things[i],"",parameternames_ordered_pic_abi2)
+  parameternames_ordered_fag_syl2 = gsub(noisy_things[i],"",parameternames_ordered_fag_syl2)
+  parameternames_ordered_pin_syl2 = gsub(noisy_things[i],"",parameternames_ordered_pin_syl2)
+  parameternames_ordered_mixed2 = gsub(noisy_things[i],"",parameternames_ordered_mixed2)
+}
+
+ordering_fag_syl = match(parameternames_ordered_pic_abi2,parameternames_ordered_fag_syl2)
+ordering_pin_syl = match(parameternames_ordered_pic_abi2,parameternames_ordered_pin_syl2)
+ordering_mixed = match(parameternames_ordered_pic_abi2, parameternames_ordered_mixed2)
+
+parameters = readRDS("Parameter_list.rds")
+drivers = c("co2","ndep","insol","temp","ph","prec")
+
+variablenames = c(as.character(parameters$Pic_abi[,"NameRLPJ"]),drivers)
+variablenames2 = substring(variablenames,regexpr("_", variablenames) + 1)
+noisy_things = c("intolerant","tolerant","tree","abi","change","_","syl","leaved")
+for(i in 1:length(noisy_things)){
+  variablenames2 = gsub(noisy_things[i],"",variablenames2)
+}
+
+grouping = read.csv("./Grouping_Fag_syl.csv", header = T, sep = ";")
+grouping = c(as.character(grouping[,1]), rep("Drivers",6))
+
+order_grouping = match(parameternames_ordered_pic_abi2,variablenames2)
+grouping2 = grouping[order_grouping]
+driver_parameters = which(grouping2 == "Drivers")
+drivernames = parameternames_ordered_pic_abi2[driver_parameters]
+
+### Loading the results of the linear regressions ###
+
+effects_Pic_abi = readRDS("LPJrunTest/Results/Pic_abi_effects_lin.rds")
+
+effects_Fag_syl = readRDS("LPJrunTest/Results/Fag_syl_effects_lin.rds")
+
+effects_Pin_syl = readRDS("LPJrunTest/Results/Pin_syl_effects_lin.rds")
+
+effects_mixed = readRDS("LPJrunTest/Results/mixed_effects_lin.rds")
+
+parameter_ranges_list <- readRDS("Parameter_list.rds")
+
+for(i in 1:length(parameter_ranges_list)){
+  for(j in 3:4){
+    parameter_ranges_list[[i]][,j] = as.character(parameter_ranges_list[[i]][,j])
+    for(k in 1:nrow(parameter_ranges_list[[i]])){
+      parameter_ranges_list[[i]][k,j] = sub(",",".",parameter_ranges_list[[i]][k,j])
+    }
+  }
+}
+
+parameter_ranges_list[["Pic_abi"]][,1] = sub("_","",parameter_ranges_list[["Pic_abi"]][,1])
+parameter_ranges_list[["Pic_abi"]][,1] =  sub("longetivity","longevity",parameter_ranges_list[["Pic_abi"]][,1])
+parameter_ranges_list[["Pic_abi"]][,1] =  sub("respocoeff","respcoeff",parameter_ranges_list[["Pic_abi"]][,1])
+parameter_ranges_list[["Pic_abi"]][,1] =  sub(" ","",parameter_ranges_list[["Pic_abi"]][,1])
+parameter_ranges_list[["Pic_abi"]][,1] =  sub("_","",parameter_ranges_list[["Pic_abi"]][,1])
+match_parameter_ranges_Pic_abi = match(parameternames_ordered_pic_abi2,c(drivers,parameter_ranges_list[["Pic_abi"]][,1]))
+
+parameter_ranges_list[["Pin_syl"]][,1] = sub("_","",parameter_ranges_list[["Pin_syl"]][,1])
+parameter_ranges_list[["Pin_syl"]][,1] =  sub("longetivity","longevity",parameter_ranges_list[["Pin_syl"]][,1])
+parameter_ranges_list[["Pin_syl"]][,1] =  sub("respocoeff","respcoeff",parameter_ranges_list[["Pin_syl"]][,1])
+parameter_ranges_list[["Pin_syl"]][,1] =  sub(" ","",parameter_ranges_list[["Pin_syl"]][,1])
+parameter_ranges_list[["Pin_syl"]][,1] =  sub("_","",parameter_ranges_list[["Pin_syl"]][,1])
+match_parameter_ranges_Pin_syl = match(parameternames_ordered_pin_syl2,c(drivers,parameter_ranges_list[["Pin_syl"]][,1]))
+
+parameter_ranges_list[["Fag_syl"]][,1] = sub("_","",parameter_ranges_list[["Fag_syl"]][,1])
+parameter_ranges_list[["Fag_syl"]][,1] =  sub("longetivity","longevity",parameter_ranges_list[["Fag_syl"]][,1])
+parameter_ranges_list[["Fag_syl"]][,1] =  sub("respocoeff","respcoeff",parameter_ranges_list[["Fag_syl"]][,1])
+parameter_ranges_list[["Fag_syl"]][,1] =  sub(" ","",parameter_ranges_list[["Fag_syl"]][,1])
+parameter_ranges_list[["Fag_syl"]][,1] =  sub("_","",parameter_ranges_list[["Fag_syl"]][,1])
+match_parameter_ranges_Fag_syl = match(parameternames_ordered_fag_syl2,c(drivers,parameter_ranges_list[["Fag_syl"]][,1]))
+#### Analysis for Pic abi ####
+
+
+mean_effects_Pic_abi_cpool = effects_Pic_abi[["cpool"]][["complete"]]
+growth_sites_Pic_abi = which(mean_effects_Pic_abi_cpool[,39]/200 > 2)
+mean_effects_Pic_abi_cpool = get_sensitivities(uncertainty_estimates = mean_effects_Pic_abi_cpool,
+                                               climaticranges = climaticranges,
+                                               species = "Pic_abi",
+                                               parameter_ranges_list = parameter_ranges_list,
+                                               parameternames_ordered = parameternames_ordered_pic_abi2,
+                                               driver_parameters = driver_parameters)
+mean_effects_Pic_abi_cpool = mean_effects_Pic_abi_cpool[growth_sites_Pic_abi,]
+
+main_effects_Pic_abi_cpool = apply(abs(mean_effects_Pic_abi_cpool[,1:38]),2,mean)
+main_effects_Pic_abi_cpool_weight_abs = main_effects_Pic_abi_cpool/sum(abs(main_effects_Pic_abi_cpool))
+
+
+main_effects_Pic_abi_cpool = apply(mean_effects_Pic_abi_cpool[,1:38],2,mean)
+main_effects_Pic_abi_cpool_weight = main_effects_Pic_abi_cpool/sum(abs(main_effects_Pic_abi_cpool))
+
+
+mean_effects_Pic_abi_cflux = effects_Pic_abi[["cflux"]][["complete"]]
+mean_effects_Pic_abi_flux = get_sensitivities(uncertainty_estimates = mean_effects_Pic_abi_cflux,
+                                               climaticranges = climaticranges,
+                                               species = "Pic_abi",
+                                               parameter_ranges_list = parameter_ranges_list,
+                                               parameternames_ordered = parameternames_ordered_pic_abi2,
+                                               driver_parameters = driver_parameters)
+mean_effects_Pic_abi_cflux = mean_effects_Pic_abi_cflux[growth_sites_Pic_abi,]
+
+
+main_effects_Pic_abi_cflux = apply(abs(mean_effects_Pic_abi_cflux[,1:38]),2,mean)
+main_effects_Pic_abi_cflux_weight_abs = main_effects_Pic_abi_cflux/sum(abs(main_effects_Pic_abi_cflux))
+# sd_Pic_abic_cmass_abs = apply(abs(mean_effects_Pic_abi_cmass[,1:38]),2,sd)
+
+main_effects_Pic_abi_cflux = apply(mean_effects_Pic_abi_cflux[,1:38],2,mean)
+main_effects_Pic_abi_cflux_weight = main_effects_Pic_abi_cflux/sum(abs(main_effects_Pic_abi_cflux))
+
+
+mean_effects_Pic_abi_agpp = effects_Pic_abi[["agpp"]][["complete"]]
+mean_effects_Pic_abi_agpp = get_sensitivities(uncertainty_estimates = mean_effects_Pic_abi_agpp,
+                                               climaticranges = climaticranges,
+                                               species = "Pic_abi",
+                                               parameter_ranges_list = parameter_ranges_list,
+                                               parameternames_ordered = parameternames_ordered_pic_abi2,
+                                               driver_parameters = driver_parameters)
+mean_effects_Pic_abi_agpp = mean_effects_Pic_abi_agpp[growth_sites_Pic_abi,]
+
+main_effects_Pic_abi_agpp = apply(abs(mean_effects_Pic_abi_agpp[,1:38]),2,mean)
+main_effects_Pic_abi_agpp_weight_abs = main_effects_Pic_abi_agpp/sum(abs(main_effects_Pic_abi_agpp))
+
+main_effects_Pic_abi_agpp = apply(mean_effects_Pic_abi_agpp[,1:38],2,mean)
+main_effects_Pic_abi_agpp_weight = main_effects_Pic_abi_agpp/sum(abs(main_effects_Pic_abi_agpp))
+
+#### Analysis for Fag syl ####
+
+
+
+mean_effects_Fag_syl_cpool = effects_Fag_syl[["cpool"]][["complete"]]
+growth_sites_Fag_syl = which(mean_effects_Fag_syl_cpool[,39]/200 > 2)
+mean_effects_Fag_syl_cpool[,1:38] = mean_effects_Fag_syl_cpool[,ordering_fag_syl]
+mean_effects_Fag_syl_cpool = get_sensitivities(uncertainty_estimates = mean_effects_Fag_syl_cpool,
+                                               climaticranges = climaticranges,
+                                               species = "Fag_syl",
+                                               parameter_ranges_list = parameter_ranges_list,
+                                               parameternames_ordered = parameternames_ordered_pic_abi2,
+                                               driver_parameters = driver_parameters)
+mean_effects_Fag_syl_cpool = mean_effects_Fag_syl_cpool[growth_sites_Fag_syl,]
+
+main_effects_Fag_syl_cpool = apply(abs(mean_effects_Fag_syl_cpool[,1:38]),2,mean)
+main_effects_Fag_syl_cpool_weight_abs = main_effects_Fag_syl_cpool/sum(abs(main_effects_Fag_syl_cpool))
+
+main_effects_Fag_syl_cpool = apply(mean_effects_Fag_syl_cpool[,1:38],2,mean)
+main_effects_Fag_syl_cpool_weight = main_effects_Fag_syl_cpool/sum(abs(main_effects_Fag_syl_cpool))
+
+mean_effects_Fag_syl_cflux = effects_Fag_syl[["cflux"]][["complete"]]
+mean_effects_Fag_syl_cflux[,1:38] = mean_effects_Fag_syl_cflux[,ordering_fag_syl]
+mean_effects_Fag_syl_cflux = get_sensitivities(uncertainty_estimates = mean_effects_Fag_syl_cflux,
+                                               climaticranges = climaticranges,
+                                               species = "Fag_syl",
+                                               parameter_ranges_list = parameter_ranges_list,
+                                               parameternames_ordered = parameternames_ordered_pic_abi2,
+                                               driver_parameters = driver_parameters)
+mean_effects_Fag_syl_cflux = mean_effects_Fag_syl_cflux[growth_sites_Fag_syl,]
+
+main_effects_Fag_syl_cflux = apply(abs(mean_effects_Fag_syl_cflux[,1:38]),2,mean)
+main_effects_Fag_syl_cflux_weight_abs = main_effects_Fag_syl_cflux/sum(abs(main_effects_Fag_syl_cflux))
+
+main_effects_Fag_syl_cflux = apply(mean_effects_Fag_syl_cflux[,1:38],2,mean)
+main_effects_Fag_syl_cflux_weight = main_effects_Fag_syl_cflux/sum(abs(main_effects_Fag_syl_cflux))
+
+
+mean_effects_Fag_syl_agpp = effects_Fag_syl[["agpp"]][["complete"]]
+mean_effects_Fag_syl_agpp[,1:38] = mean_effects_Fag_syl_agpp[,ordering_fag_syl]
+mean_effects_Fag_syl_agpp = get_sensitivities(uncertainty_estimates = mean_effects_Fag_syl_agpp,
+                                               climaticranges = climaticranges,
+                                               species = "Fag_syl",
+                                               parameter_ranges_list = parameter_ranges_list,
+                                               parameternames_ordered = parameternames_ordered_pic_abi2,
+                                               driver_parameters = driver_parameters)
+mean_effects_Fag_syl_agpp = mean_effects_Fag_syl_agpp[growth_sites_Fag_syl,]
+
+main_effects_Fag_syl_agpp = apply(abs(mean_effects_Fag_syl_agpp[,1:38]),2,mean)
+main_effects_Fag_syl_agpp_weight_abs = main_effects_Fag_syl_agpp/sum(abs(main_effects_Fag_syl_agpp))
+
+main_effects_Fag_syl_agpp = apply(mean_effects_Fag_syl_agpp[,1:38],2,mean)
+main_effects_Fag_syl_agpp_weight = main_effects_Fag_syl_agpp/sum(abs(main_effects_Fag_syl_agpp))
+
+
+#### Analysis for Pin syl ####
+
+
+
+mean_effects_Pin_syl_cpool = effects_Pin_syl[["cpool"]][["complete"]]
+growth_sites_Pin_syl = which(mean_effects_Pin_syl_cpool[,39]/200 > 2)
+mean_effects_Pin_syl_cpool[,1:38] = mean_effects_Pin_syl_cpool[,ordering_pin_syl]
+mean_effects_Pin_syl_cpool = get_sensitivities(uncertainty_estimates = mean_effects_Pin_syl_cpool,
+                                               climaticranges = climaticranges,
+                                               species = "Pin_syl",
+                                               parameter_ranges_list = parameter_ranges_list,
+                                               parameternames_ordered = parameternames_ordered_pic_abi2,
+                                               driver_parameters = driver_parameters)
+mean_effects_Pin_syl_cpool = mean_effects_Pin_syl_cpool[growth_sites_Pin_syl,]
+
+main_effects_Pin_syl_cpool = apply(abs(mean_effects_Pin_syl_cpool[,1:38]),2,mean)
+main_effects_Pin_syl_cpool_weight_abs = main_effects_Pin_syl_cpool/sum(abs(main_effects_Pin_syl_cpool))
+
+main_effects_Pin_syl_cpool = apply(mean_effects_Pin_syl_cpool[,1:38],2,mean)
+main_effects_Pin_syl_cpool_weight = main_effects_Pin_syl_cpool/sum(abs(main_effects_Pin_syl_cpool))
+
+mean_effects_Pin_syl_cflux = effects_Pin_syl[["cflux"]][["complete"]]
+mean_effects_Pin_syl_cflux[,1:38] = mean_effects_Pin_syl_cflux[,ordering_pin_syl]
+mean_effects_Pin_syl_cflux = get_sensitivities(uncertainty_estimates = mean_effects_Pin_syl_cflux,
+                                               climaticranges = climaticranges,
+                                               species  = "Pin_syl",
+                                               parameter_ranges_list = parameter_ranges_list,
+                                               parameternames_ordered = parameternames_ordered_pic_abi2,
+                                               driver_parameters = driver_parameters)
+
+mean_effects_Pin_syl_cflux = mean_effects_Pin_syl_cflux[growth_sites_Pin_syl,]
+
+main_effects_Pin_syl_cflux = apply(abs(mean_effects_Pin_syl_cflux[,1:38]),2,mean)
+main_effects_Pin_syl_cflux_weight_abs = main_effects_Pin_syl_cflux/sum(abs(main_effects_Pin_syl_cflux))
+
+main_effects_Pin_syl_cflux = apply(mean_effects_Pin_syl_cflux[,1:38],2,mean)
+main_effects_Pin_syl_cflux_weight = main_effects_Pin_syl_cflux/sum(abs(main_effects_Pin_syl_cflux))
+
+
+mean_effects_Pin_syl_agpp = effects_Pin_syl[["agpp"]][["complete"]]
+mean_effects_Pin_syl_agpp[,1:38] = mean_effects_Pin_syl_agpp[,ordering_pin_syl]
+mean_effects_Pin_syl_agpp = get_sensitivities(uncertainty_estimates = mean_effects_Pin_syl_agpp,
+                                               climaticranges = climaticranges,
+                                               species  = "Pin_syl",
+                                               parameter_ranges_list = parameter_ranges_list,
+                                               parameternames_ordered = parameternames_ordered_pic_abi2,
+                                               driver_parameters = driver_parameters)
+mean_effects_Pin_syl_agpp = mean_effects_Pin_syl_agpp[growth_sites_Pin_syl,]
+
+
+main_effects_Pin_syl_agpp = apply(abs(mean_effects_Pin_syl_agpp[,1:38]),2,mean)
+main_effects_Pin_syl_agpp_weight_abs = main_effects_Pin_syl_agpp/sum(abs(main_effects_Pin_syl_agpp))
+
+main_effects_Pin_syl_agpp = apply(mean_effects_Pin_syl_agpp[,1:38],2,mean)
+main_effects_Pin_syl_agpp_weight = main_effects_Pin_syl_agpp/sum(abs(main_effects_Pin_syl_agpp))
+
+
+drivers_abs_agpp = cbind(main_effects_Pic_abi_agpp[driver_parameters],
+                    main_effects_Fag_syl_agpp[driver_parameters],
+                    main_effects_Pin_syl_agpp[driver_parameters])
+
+drivers_abs_cflux = cbind(main_effects_Pic_abi_cflux[driver_parameters],
+                         main_effects_Fag_syl_cflux[driver_parameters],
+                         main_effects_Pin_syl_cflux[driver_parameters])
+
+drivers_abs_cpool = cbind(main_effects_Pic_abi_cpool[driver_parameters],
+                         main_effects_Fag_syl_cpool[driver_parameters],
+                         main_effects_Pin_syl_cpool[driver_parameters])
+
+
+colnames(drivers_abs_agpp) = c("Pic. abi.","Fag. syl.","Pin. syl.")
+rownames(drivers_abs_agpp) = drivernames
+
+
+colnames(drivers_abs_cpool) = c("Pic. abi.","Fag. syl.","Pin. syl.")
+rownames(drivers_abs_cpool) = drivernames
+
+colnames(drivers_abs_cflux) = c("Pic. abi.","Fag. syl.","Pin. syl.")
+rownames(drivers_abs_cflux) = drivernames
+```
+
+```{r mylatextable, results = "asis"}
+stargazer(round(drivers_abs_agpp,2), type = "latex")
+```
+```{r mylatextable2, results = "asis"}
+stargazer(round(drivers_abs_cflux,2), type = "latex")
+```
+```{r mylatextable3, results = "asis"}
+stargazer(round(drivers_abs_cpool,2), type = "latex")
+```

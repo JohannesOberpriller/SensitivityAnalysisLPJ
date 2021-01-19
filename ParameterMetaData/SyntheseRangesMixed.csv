@@ -1,0 +1,69 @@
+Parameter ;Default;Minimum Value;Maximum Value;NameRLPJ
+lambda_max;0,8;0.6;0.8;common_lambda_max
+emax;5;2;6;common_emax
+reprfrac;0,1;0,05;0,3;common_reprfrac
+nfix_a;0,102;0,102;0,367;run_nfix_a
+nfix_b;0,524;-0,754;0,524;run_nfix_b
+nrelocfrac;0,5;0,1;0,8;run_nrelocfrac
+turnover_root;0,7;0,65;0,75;tree_turnover_root
+distinterval;920;200;1000;run_distinterval
+crownarea_max;40;20;60;tree_crownarea_max
+k_allom2;60;30;80;tree_k_allom2
+k_rp;1,6;1,3;1,6;tree_k_rp
+longetivity;500;300;900;Pin_syl_longevity
+leaflong;4;2,5;7;Pin_syl_leaflong
+fireresist;0,4;0,05;0,7;Pin_syl_fireresist
+gmin;0,3;0,22;0,38;Pin_syl_gmin
+sla;8,56;7,812;9,3;Pin_syl_sla
+est_max;0,2;0,1;0,25;shade_intolerant_est_max
+turnover_sap;0,085;0,05;0,1;Pin_syl_turnover_sap
+alphar;10;4;15;shade_intolerant_alphar
+greff_min;0,21;0,07;0,26;Pin_syl_greff_min
+k_latosa;3000;1800;5200;Pin_syl_k_latosa
+drought_tolerance ;0,25;0,1;0,4;Pin_syl_drought_tolerance
+k_allom2;30;15;60;Pin_syl_k_allom2
+parff_min;2500000;1500000;3500000;shade_intolerant_parff_min
+k_chillb;100;80;800;Pin_syl_k_chillb
+gdd5min_est ;500;250;700;Pin_syl_gdd5min_est
+tcmin_est;-29;-100;-15;Pin_syl_tcmin_est
+tcmax_est;5,5;-1.0 ;6;Pin_syl_tcmax_est
+longetivity;300;200;1000;Pic_abi_longevity
+leaflong;7;4;10;Pic_abi_leaflong
+fireresist;0,1;0,05;0,8;Pic_abi_fireresist
+gmin;0,3;0,22;0,38;Pic_abi_gmin
+sla;11,52;8,7;15,1;Pic_abi_sla
+est_max;0,1;0,05;0,2;shade_tolerant_est_max
+turnover_sap;0,065;0,04;0,09;Pic_abi_turnover_sap
+alphar;4;2;5;Pic_abi_alphar
+greff_min;0,135;0,03;0,19;Pic_abi_greff_min
+k_latosa;4000;2500;7000;needle_leaved_k_latosa
+drought_tolerance ;0,48;0,2;0,65;Pic_abi_drought_tolerance
+k_chillb;100;80;800;Pic_abi_k_chillb
+gdd5min_est ;350;300;700;Pic_abi_gdd5min_est
+tcmin_est;-29;-100;-15;Pic_abi_tcmin_est
+tcmax_est;3;-2;6;Pic_abi_tcmax_est
+longetivity;400;250;650;Fag_syl_longevity
+leaflong;0,5;0,4;0,8;broad_leaved_leaflong
+fireresist;0,1;0,05;0,8;Fag_syl_fireresist
+gmin;0,5;0,42;0,58;Fag_syl_gmin
+sla;43,08;28,33;48,23;Fag_syl_sla
+est_max;0,2;0,05;0,25;Fag_syl_est_max
+turnover_sap;0,085;0,05;0,1;Fag_syl_turnover_sap
+alphar;2;0,8;5;shade_tolerant_alphar
+respcoeff;1;0,5;1,5;temperate_tree_respcoeff
+pstemp_low;15;8;20;temperate_tree_pstemp_low
+pstemp_high;25;20;30;temperate_tree_pstemp_high
+greff_min;0,02;0,001;0,13;Fag_syl_greff_min
+k_latosa;5000;2500;8000;broad_leaved_k_latosa
+drought_tolerance ;0,39;0,2;0,49;Fag_syl_drought_tolerance
+parff_min;1000000;100000;1600000;shade_tolerant_parff_min
+k_chillb;600;250;800;Fag_syl_k_chillb
+gdd5min_est ;1300;1050;1450;Fag_syl_gdd5min_est
+tcmin_est;-6.5 ;-8;-5;Fag_syl_tcmin_est
+tcmax_est;7;5;8;Fag_syl_tcmax_est
+parff_min;1000000;750000;1600000;shade_tolerant_parff_min
+cutinterval;95;60;127;MixedC_cutinterval
+thinning_intensity;0,9;0,5;1;MixedC_thinning_intensity
+respocoeff;1;0,8;2,2;boreal_tree_respcoeff
+pstemp_low;10;6,75;14;boreal_tree_pstemp_low
+pstemp_high;25;16;30;boreal_tree_pstemp_high
