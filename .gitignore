@@ -19,3 +19,17 @@
 /Plotting/Figues_carbon_balance_country_barplot.R
 /Plotting/Figues_carbon_balance_per_country.R
 /Plotting/Figues_community_composition.R
+/ParameterMetaData/Synthese\s Parameter\s Ranges\s -\s Common.csv
+/ParameterMetaData/Synthese\s Parameter\s Ranges\s -\s Drivers.csv
+/ParameterMetaData/Synthese\s Parameter\s Ranges\s -\s Species-Specific.csv
+/ParameterMetaData/SyntheseParameterRanges.csv
+/ParameterMetaData/SyntheseParameterRanges2.csv
+
+/EnSv8/*
+/EnvironmentalData/co2_values.rds
+/EnvironmentalData/drivers.Rmd
+/EnvironmentalData/drivers.log
+/EnvironmentalData/drivers.tex
+/EnvironmentalData/env_data_old.rds
+/EnvironmentalData/ph_values.rds
+
