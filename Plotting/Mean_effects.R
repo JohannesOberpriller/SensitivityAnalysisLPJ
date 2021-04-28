@@ -550,18 +550,18 @@ dev.off()
 
 
 mean_effects_rel = data.frame("Group" = grouping2,
-                              "cpool_fag_syl" = main_effects_Fag_syl_cpool_weight,
-                              "cflux_fag_syl" = main_effects_Fag_syl_cflux_weight,
-                              "agpp_fag_syl" = main_effects_Fag_syl_agpp_weight,
-                              "cpool_pin_syl" = main_effects_Pin_syl_cpool_weight,
-                              "cflux_pin_syl" = main_effects_Pin_syl_cflux_weight,
-                              "agpp_pin_syl" = main_effects_Pin_syl_agpp_weight,
-                              "cpool_pic_abi" = main_effects_Pic_abi_cpool_weight,
-                              "cflux_pic_abi" = main_effects_Pic_abi_cflux_weight,
-                              "agpp_pic_abi" = main_effects_Pic_abi_agpp_weight,
-                              "cpool_mixed" = main_effects_mixed_cpool_weight,
-                              "cflux_mixed" = main_effects_mixed_cflux_weight,
-                              "agpp_mixed" = main_effects_mixed_agpp_weight,
+                              "cpool_fag_syl" = main_effects_Fag_syl_cpool_weight*100,
+                              "cflux_fag_syl" = main_effects_Fag_syl_cflux_weight*100,
+                              "agpp_fag_syl" = main_effects_Fag_syl_agpp_weight*100,
+                              "cpool_pin_syl" = main_effects_Pin_syl_cpool_weight*100,
+                              "cflux_pin_syl" = main_effects_Pin_syl_cflux_weight*100,
+                              "agpp_pin_syl" = main_effects_Pin_syl_agpp_weight*100,
+                              "cpool_pic_abi" = main_effects_Pic_abi_cpool_weight*100,
+                              "cflux_pic_abi" = main_effects_Pic_abi_cflux_weight*100,
+                              "agpp_pic_abi" = main_effects_Pic_abi_agpp_weight*100,
+                              "cpool_mixed" = main_effects_mixed_cpool_weight*100,
+                              "cflux_mixed" = main_effects_mixed_cflux_weight*100,
+                              "agpp_mixed" = main_effects_mixed_agpp_weight*100,
                               "Names" = parameternames_ordered_pic_abi2)
 mean_effects_rel = mean_effects_rel[order(mean_effects_rel$Group),]
 
@@ -582,7 +582,7 @@ par(mar = c(0.6,4.1,9.1,12.1))
 plot(y = rep(0,39),x=1:39,
      ylab = "", xlab = "", xaxt = "n",
      col = c(rep("white",39)),xaxt='n', bty="n", yaxt = 'n', cex.axis =2,
-     ylim = c(-0.19,0.19), cex.main = 1.5)
+     ylim = c(-19,19), cex.main = 1.5)
 mtext("Uncertainty contributions [%]", side =2, cex =1., line = 2.5)
 barplot(height = apply(rbind(mean_effects_parameters$cpool_fag_syl,
                              mean_effects_parameters$cpool_pic_abi,
@@ -591,7 +591,7 @@ barplot(height = apply(rbind(mean_effects_parameters$cpool_fag_syl,
         col = as.vector(sapply(FUN = t_col, X= colors_full, percent = 65)), add = T,axes = F,
         width = 0.85, space = c(0.5/0.85,rep(0.15/0.85,31)), pos = rep(1,32))
 points(y = mean_effects_parameters$cpool_fag_syl , x= 1:32, pch = 15,
-       ylim = c(0,0.15), col = "darkgreen",
+      col = "darkgreen",
        cex = 1.2)
 points(y = mean_effects_parameters$cpool_pic_abi,
        x = 1:nrow(mean_effects_parameters), col = "darkblue", pch = 19,cex = 1.2)
@@ -605,7 +605,7 @@ points(y = apply(rbind(mean_effects_parameters$cpool_fag_syl,
                        mean_effects_parameters$cpool_pin_syl),2,mean),
        x = 1:nrow(mean_effects_parameters), col = "black", pch = "-", cex=3)
 axis(1, at = 1:39, labels = rep("",39),srt = 45, las =2 , pos = 0)
-axis(2, at = round(seq(-0.18,0.18,length.out = 19),2), las = 2, line = -0.5)
+axis(2, at = round(seq(-18,18,length.out = 19),2), las = 2, line = -0.5)
 barplot(height = apply(rbind(mean_effects_drivers$cpool_fag_syl,
                              mean_effects_drivers$cpool_pic_abi,
                              mean_effects_drivers$cpool_pin_syl,
@@ -613,9 +613,9 @@ barplot(height = apply(rbind(mean_effects_drivers$cpool_fag_syl,
         col = as.vector(sapply(FUN = t_col, X= rep("gold2",6), percent = 65)),
         add = T,axes = F, width = 0.85, space = c(33.5/0.85,rep(0.15/0.85,5)))
 points(y =mean_effects_drivers$cpool_fag_syl, x = 34:39,col = "darkgreen",xaxt='n', bty="n", yaxt = 'n', pch = 15,
-       ylim = c(-0.19,.19),cex = 1.2)
+       cex = 1.2)
 ablineclip(v = cumsum(table(mean_effects_parameters$Group))+0.5, col = alpha("black",0.7),
-           y1 = -0.19)
+           y1 = -19)
 points(y = mean_effects_drivers$cpool_pic_abi,
        x = 34:39, col = "darkblue", pch = 19,cex = 1.2)
 points(y = mean_effects_drivers$cpool_pin_syl,
@@ -627,16 +627,16 @@ points(y = apply(rbind(mean_effects_drivers$cpool_fag_syl,
                        mean_effects_drivers$cpool_pic_abi,
                        mean_effects_drivers$cpool_pin_syl),2,mean),
        x = 34:39, col = "black", pch = "-", cex=3)
-ablineclip(v = 33,col = alpha("black",0.7),y1 = -0.19 )
+ablineclip(v = 33,col = alpha("black",0.7),y1 = -19 )
 spacings = (cumsum(table(mean_effects_parameters$Group)) + c(0,cumsum(table(mean_effects_parameters$Group))[-length(cumsum(table(mean_effects_parameters$Group)))]))/2 +0.5
 grouping_variables = names(table(mean_effects_parameters$Group))
 par(xpd =  T)
 text(c(names(table(mean_effects_rel$Group))[which(names(table(mean_effects_rel$Group)) != "Drivers")],"Drivers"),
-     x = c(spacings,36),  y = 0.21, font = 2, cex =1.7, srt = 30,
+     x = c(spacings,36),  y = 21, font = 2, cex =1.7, srt = 30,
      adj = c(0,0))
 par(xpd = F)
-#ablineclip(h = 0.19, x1 =0, x2 = 40.5)
-ablineclip(v = c(39.5), y1=-0.19)
+ablineclip(h = 19, x1 =0, x2 = 40.5)
+ablineclip(v = c(39.5), y1=-19)
 title(main = "a)", line = 6, adj = 0.01, cex.main = 2)
 
 
@@ -644,7 +644,7 @@ par(mar = c(0.6,4.1,5.6,12.1))
 plot(y = rep(0,39),x=1:39,
      ylab = "", xlab = "", xaxt = "n",
      col = c(rep("white",39)),xaxt='n', bty="n", yaxt = 'n', cex.axis =2,
-     ylim = c(-0.19,0.15), cex.main = 1.5)
+     ylim = c(-19,15), cex.main = 1.5)
 mtext("Uncertainty contributions [%]", side =2, cex =1., line = 2.5)
 barplot(height = apply(rbind(mean_effects_parameters$cflux_fag_syl,
                              mean_effects_parameters$cflux_pic_abi,
@@ -653,7 +653,7 @@ barplot(height = apply(rbind(mean_effects_parameters$cflux_fag_syl,
         col = as.vector(sapply(FUN = t_col, X= colors_full, percent = 65)), add = T,axes = F,
         width = 0.85, space = c(0.5/0.85,rep(0.15/0.85,31)), pos = rep(1,32))
 points(y = mean_effects_parameters$cflux_fag_syl , x= 1:32, pch = 15,
-       ylim = c(0,0.15), col = "darkgreen",
+       col = "darkgreen",
        cex = 1.2)
 points(y = mean_effects_parameters$cflux_pic_abi,
        x = 1:nrow(mean_effects_parameters), col = "darkblue", pch = 19,cex = 1.2)
@@ -668,7 +668,7 @@ points(y = apply(rbind(mean_effects_parameters$cflux_fag_syl,
                  ,2,mean),
        x = 1:nrow(mean_effects_parameters), col = "black", pch = "-", cex=3)
 axis(1, at = 1:39, labels = rep("",39),srt = 45, las =2 , pos = 0)
-axis(2, at = round(seq(-0.16,0.12,length.out = 15),2), las = 2, line = -0.5)
+axis(2, at = round(seq(-16,12,length.out = 15),2), las = 2, line = -0.5)
 barplot(height = apply(rbind(mean_effects_drivers$cflux_fag_syl,
                              mean_effects_drivers$cflux_pic_abi,
                              mean_effects_drivers$cflux_pin_syl,
@@ -676,9 +676,9 @@ barplot(height = apply(rbind(mean_effects_drivers$cflux_fag_syl,
         col = as.vector(sapply(FUN = t_col, X= rep("gold2",6), percent = 65)),
         add = T,axes = F, width = 0.85, space = c(33.5/0.85,rep(0.15/0.85,5)))
 points(y =mean_effects_drivers$cflux_fag_syl, x = 34:39,col = "darkgreen",xaxt='n', bty="n", yaxt = 'n', pch = 15,
-       ylim = c(-0.16,.12),cex = 1.2)
+       ylim = c(-16,12),cex = 1.2)
 ablineclip(v = cumsum(table(mean_effects_parameters$Group))+0.5, col = alpha("black",0.7),
-           y1 = -0.16, y2 =0.12)
+           y1 = -16, y2 =12)
 points(y = mean_effects_drivers$cflux_pic_abi,
        x = 34:39, col = "darkblue", pch = 19,cex = 1.2)
 points(y = mean_effects_drivers$cflux_pin_syl,
@@ -691,11 +691,11 @@ points(y = apply(rbind(mean_effects_drivers$cflux_fag_syl,
                        mean_effects_drivers$cflux_pin_syl)
                  ,2,mean),
        x = 34:39, col = "black", pch = "-", cex=3)
-ablineclip(v = 33,col = alpha("black",0.7),y1 = -0.16, y2 =0.12 )
+ablineclip(v = 33,col = alpha("black",0.7),y1 = -16, y2 = 12 )
 spacings = (cumsum(table(mean_effects_parameters$Group)) + c(0,cumsum(table(mean_effects_parameters$Group))[-length(cumsum(table(mean_effects_parameters$Group)))]))/2 +0.5
 grouping_variables = names(table(mean_effects_parameters$Group))
 par(xpd=T)
-legend(x = 40, y = 0.1,
+legend(x = 40, y = 10,
        legend = c("Fag. syl.","Pic. abi.",'Pin. syl.',"Mixed",'Mean Mono'),
        col = c('darkgreen', 'darkblue','brown', "purple",'black'), bty = 'n',
        title = as.expression(bquote(italic(bold("Species")))),
@@ -703,14 +703,14 @@ legend(x = 40, y = 0.1,
        lwd = 2)
 par(xpd = F)
 #ablineclip(h = 0.12, x1 =0, x2 = 40.5)
-ablineclip(v = c(39.5), y1=-0.16, y2 =0.12)
+ablineclip(v = c(39.5), y1=-16, y2 = 12)
 title(main = "b)", line = 2, adj = 0.01, cex.main = 2)
 
 par(mar = c(1.1,4.1,6.1,12.1))
 plot(y = rep(0,39),x=1:39,
      ylab = "", xlab = "", xaxt = "n",
      col = c(rep("white",39)),xaxt='n', bty="n", yaxt = 'n', cex.axis =2,
-     ylim = c(-0.19,0.14), cex.main = 1.5)
+     ylim = c(-19,14), cex.main = 1.5)
 mtext("Uncertainty contributions [%]", side =2, cex =1., line = 2.5)
 barplot(height = apply(rbind(mean_effects_parameters$agpp_fag_syl,
                              mean_effects_parameters$agpp_pic_abi,
@@ -719,7 +719,7 @@ barplot(height = apply(rbind(mean_effects_parameters$agpp_fag_syl,
         col = as.vector(sapply(FUN = t_col, X= colors_full, percent = 65)), add = T,axes = F,
         width = 0.85, space = c(0.5/0.85,rep(0.15/0.85,31)), pos = rep(1,32))
 points(y = mean_effects_parameters$agpp_fag_syl , x= 1:32, pch = 15,
-       ylim = c(0,0.15), col = "darkgreen",
+        col = "darkgreen",
        cex = 1.2)
 points(y = mean_effects_parameters$agpp_pic_abi,
        x = 1:nrow(mean_effects_parameters), col = "darkblue", pch = 19,cex = 1.2)
@@ -734,7 +734,7 @@ points(y = apply(rbind(mean_effects_parameters$agpp_fag_syl,
        x = 1:nrow(mean_effects_parameters), col = "black", pch = "-", cex=3)
 axis(1, at = 1:39, labels = rep("",39),
      srt = 45, las =2 , pos = 0)
-axis(2, at = round(seq(-0.24,0.14,length.out = 20),2), las = 2, line = -0.5)
+axis(2, at = round(seq(-24,14,length.out = 20),2), las = 2, line = -0.5)
 barplot(height = apply(rbind(mean_effects_drivers$agpp_fag_syl,
                              mean_effects_drivers$agpp_pic_abi,
                              mean_effects_drivers$agpp_pin_syl,
@@ -742,9 +742,9 @@ barplot(height = apply(rbind(mean_effects_drivers$agpp_fag_syl,
         col = as.vector(sapply(FUN = t_col, X= rep("gold2",6), percent = 65)),
         add = T,axes = F, width = 0.85, space = c(33.5/0.85,rep(0.15/0.85,5)))
 points(y =mean_effects_drivers$agpp_fag_syl, x = 34:39,col = "darkgreen",xaxt='n', bty="n", yaxt = 'n', pch = 15,
-       ylim = c(-0.26,.14),cex = 1.2)
+       cex = 1.2)
 ablineclip(v = cumsum(table(mean_effects_parameters$Group))+0.5, col = alpha("black",0.7),
-           y1 = -0.25, y2= 0.14)
+           y1 = -25, y2= 14)
 points(y = mean_effects_drivers$agpp_pic_abi,
        x = 34:39, col = "darkblue", pch = 19,cex = 1.2)
 points(y = mean_effects_drivers$agpp_pin_syl,
@@ -757,11 +757,11 @@ points(y = apply(rbind(mean_effects_drivers$agpp_fag_syl,
                        mean_effects_drivers$agpp_pin_syl)
                  ,2,mean),
        x = 34:39, col = "black", pch = "-", cex=3)
-ablineclip(v = 33,col = alpha("black",0.7),y1 = -0.25, y2= 0.14 )
+ablineclip(v = 33,col = alpha("black",0.7),y1 = -25, y2= 14 )
 spacings = (cumsum(table(mean_effects_parameters$Group)) + c(0,cumsum(table(mean_effects_parameters$Group))[-length(cumsum(table(mean_effects_parameters$Group)))]))/2 +0.5
 grouping_variables = names(table(mean_effects_parameters$Group))
 #ablineclip(h = 0.14, x1 =0, x2 = 40.5)
-ablineclip(v = c(39.5), y1=-0.25, y2= 0.14)
+ablineclip(v = c(39.5), y1=-25, y2= 14)
 title(main = "c)", line = 1.7, adj = 0.01, cex.main = 2)
 
 par(mar = c(1.1,4.1,0.1,12.1))
@@ -770,7 +770,7 @@ plot(y = rep(0,39),x=1:39,
      col = c(rep("white",39)),xaxt='n', bty="n", yaxt = 'n', cex.axis =2,
      ylim = c(-0.01,0.01), cex.main = 1.5)
 par(xpd = T)
-text(x = 1:39, y = 0.01, c(as.character(mean_effects_parameters$Names),"",
+text(x = 1:39-0.5, y = 0.01, c(as.character(mean_effects_parameters$Names),"",
                             as.character(mean_effects_drivers$Names)),srt = 270,
                           adj = c(0.0,0.), cex =1.5)
 par(xpd = F)

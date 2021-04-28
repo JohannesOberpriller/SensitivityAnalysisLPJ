@@ -22,7 +22,7 @@ remap_paramters <- function(parameters, weighting_scheme, position_scheme){
 
 ## getting the ordered parameter names ##
 
-parameters = readRDS("Parameter_list.rds")
+parameters = readRDS("ParameterMetaData/Parameter_list.rds")
 drivernames  = paste0("run_",c("co2","ndep","insol","temp","ph","prec"),"_change")
 parameters_pic_abi = c(as.character(parameters$Pic_abi$NameRLPJ), drivernames)
 parameters_fag_syl = c(as.character(parameters$Fag_syl$NameRLPJ), drivernames)
@@ -391,66 +391,424 @@ average_effects_agpp = (aggregated_effects_Fag_syl_agpp_scaled +
                           aggregated_effects_Pic_abi_agpp_scaled +
                           aggregated_effects_mixed_agpp_scaled)/4
 
-#### Precipitation ######
+# #### Precipitation ######
+#
+#
+# ### cpool
+#
+# average_effects_cpool <- cbind(average_effects_cpool, sites[["Precipitation [l/m^2]"]])
+# colnames(average_effects_cpool) = c(colnames(aggregated_effects_Pic_abi_cpool_scaled), "Precipitation")
+#
+# df_effects_cpool_prec = matrix(ncol = 4, nrow = 7)
+# colnames(df_effects_cpool_prec) = c("minimum","maximum","mean","effectsize")
+# for(i in 1:7){
+#   print(i)
+#   df_effects_cpool_prec[i,1] = min(average_effects_cpool[,i],na.rm = T)
+#   df_effects_cpool_prec[i,2] = max(average_effects_cpool[,i],na.rm = T)
+#   df_effects_cpool_prec[i,3] = mean(average_effects_cpool[,i],na.rm = T)
+#   df_effects_cpool_prec_lm = lm(average_effects_cpool[,i] ~log(average_effects_cpool[,8]))
+#   df_effects_cpool_prec[i,4] = coef(df_effects_cpool_prec_lm)[2]
+# }
+# rownames(df_effects_cpool_prec)= colnames(average_effects_cpool)[1:7]
+#
+#
+#
+# ### cflux
+#
+#
+# average_effects_cflux <- cbind(average_effects_cflux, sites[["Precipitation [l/m^2]"]])
+# colnames(average_effects_cflux) = c(colnames(aggregated_effects_Pic_abi_cflux_scaled), "Precipitation")
+#
+# df_effects_cflux_prec = matrix(ncol = 4, nrow = 7)
+# colnames(df_effects_cflux_prec) = c("minimum","maximum","mean","effectsize")
+# for(i in 1:7){
+#   print(i)
+#   df_effects_cflux_prec[i,1] = min(average_effects_cflux[,i],na.rm = T)
+#   df_effects_cflux_prec[i,2] = max(average_effects_cflux[,i],na.rm = T)
+#   df_effects_cflux_prec[i,3] = mean(average_effects_cflux[,i],na.rm = T)
+#   df_effects_cflux_prec_lm = lm(average_effects_cflux[,i] ~log(average_effects_cflux[,8]))
+#   df_effects_cflux_prec[i,4] = coef(df_effects_cflux_prec_lm)[2]
+# }
+# rownames(df_effects_cflux_prec)= colnames(average_effects_cflux)[1:7]
+#
+#
+# ### agpp
+#
+# average_effects_agpp <- cbind(average_effects_agpp, sites[["Precipitation [l/m^2]"]])
+# colnames(average_effects_agpp) = c(colnames(aggregated_effects_Pic_abi_agpp_scaled), "Precipitation")
+#
+# df_effects_agpp_prec = matrix(ncol = 4, nrow = 7)
+# colnames(df_effects_agpp_prec) = c("minimum","maximum","mean","effectsize")
+# for(i in 1:7){
+#   print(i)
+#   df_effects_agpp_prec[i,1] = min(average_effects_agpp[,i],na.rm = T)
+#   df_effects_agpp_prec[i,2] = max(average_effects_agpp[,i],na.rm = T)
+#   df_effects_agpp_prec[i,3] = mean(average_effects_agpp[,i],na.rm = T)
+#   df_effects_agpp_prec_lm = lm(average_effects_agpp[,i] ~ log(average_effects_agpp[,8]))
+#   df_effects_agpp_prec[i,4] = coef(df_effects_agpp_prec_lm)[2]
+# }
+# rownames(df_effects_agpp_prec)= colnames(average_effects_agpp)[1:7]
+
+pdf("Figures/Changing_uncertainty_cflux.pdf", width = 10, height = 10)
+plot(1,xlim=c(min(df_effects_cflux_temp[,4]*100)*1.5, max(df_effects_cflux_temp[,4])*100)*1.2,
+     ylab = "", xlab = "", xaxt = "n", yaxt = 'n',  ylim = c(1,7),bty="n", type = "n")
+par(xpd =T)
+text(x = min(df_effects_cflux_temp[,4]*100)*1.3, y = 1:7, rownames(df_effects_cflux_temp), font =2, cex = 1.5, pos =2)
+par(xpd =F)
+abline(v = 1.25*min(df_effects_cflux_temp[,4])*100)
+abline(v =0)
+for(i in 1:7){
+  arrows(x0 = 0, x1 = df_effects_cflux_temp[i,4]*100, y0 = i, y1=i, lwd =3, length = 0.1)
+}
+axis(side = 1, at = seq(from = -0.8, to = 0.8,length.out = 5))
+mtext("Change in uncertatinty contributions on a temperature gradient [%/°C]",side =1,line = 2.5, cex =1.5)
+
+dev.off()
+
+
+pdf("Figures/Changing_uncertainty_agpp.pdf", width = 10, height = 10)
+plot(1,xlim=c(min(df_effects_agpp_temp[,4]*100)*1.7, max(df_effects_agpp_temp[,4])*100)*1.2,
+     ylab = "", xlab = "", xaxt = "n", yaxt = 'n',  ylim = c(1,7),bty="n", type = "n")
+par(xpd =T)
+text(x = -0.8, y = 1:7, rownames(df_effects_agpp_temp), font =2, cex = 1.5, pos =2)
+par(xpd =F)
+abline(v = -0.8)
+abline(v =0)
+for(i in 1:7){
+  arrows(x0 = 0, x1 = df_effects_agpp_temp[i,4]*100, y0 = i, y1=i, lwd =3, length = 0.1)
+}
+axis(side = 1, at = seq(from = -0.8, to = 1.2,length.out = 6))
+mtext("Change in uncertatinty contributions on a temperature gradient [%/°C]",side =1,line = 2.5, cex =1.5)
+
+dev.off()
+
+
+
+pdf("Figures/Changing_uncertainty_cpool.pdf", width = 10, height = 10)
+plot(1,xlim=c(min(df_effects_cpool_temp[,4]*100)*1.5, max(df_effects_cpool_temp[,4])*100)*1.2,
+     ylab = "", xlab = "", xaxt = "n", yaxt = 'n',  ylim = c(1,7),bty="n", type = "n")
+par(xpd =T)
+text(x = min(df_effects_cpool_temp[,4]*100)*1.3, y = 1:7, rownames(df_effects_cpool_temp), font =2, cex = 1.5, pos =2)
+par(xpd =F)
+abline(v = -0.5)
+abline(v =0)
+for(i in 1:7){
+  arrows(x0 = 0, x1 = df_effects_cpool_temp[i,4]*100, y0 = i, y1=i, lwd =3, length = 0.1)
+}
+axis(side = 1, at = seq(from = -0.5, to = 0.5,length.out = 3))
+mtext("Change in uncertatinty contributions on a temperature gradient [%/°C]",side =1,line = 2.5, cex =1.5)
+
+dev.off()
+
+
+
+
+aggregated_effects_Pic_abi_cpool_scaled = matrix(nrow = nrow(sites), ncol = 6)
+for(i in 1:nrow(sites)){
+  if(i %in% growth_sites_Pic_abi){
+    aux_df_Pic_abi_cpool_agg = data.frame("group" = grouping2, "effect" = abs(t(mean_effects_Pic_abi_cpool_scaled[,1:38]))[,i])
+    aggregated_effects_Pic_abi_cpool_scaled[i,] = aux_df_Pic_abi_cpool_agg[which(aux_df_Pic_abi_cpool_agg$group =="Drivers"),"effect"]/
+                                                   sum(aux_df_Pic_abi_cpool_agg[,"effect"])
+  }else{
+    aggregated_effects_Pic_abi_cpool_scaled[i,] = NA
+  }
+}
+colnames(aggregated_effects_Pic_abi_cpool_scaled) = c("ph","co2","prec","temp","insol","ndep")
+
+
+aggregated_effects_Pic_abi_cflux_scaled = matrix(nrow = nrow(sites), ncol = 6)
+for(i in 1:nrow(sites)){
+  if(i %in% growth_sites_Pic_abi){
+    aux_df_Pic_abi_cflux_agg = data.frame("group" = grouping2, "effect" = abs(t(mean_effects_Pic_abi_cflux_scaled[,1:38]))[,i])
+    aggregated_effects_Pic_abi_cflux_scaled[i,] = aux_df_Pic_abi_cflux_agg[which(aux_df_Pic_abi_cflux_agg$group =="Drivers"),"effect"]/
+      sum(aux_df_Pic_abi_cflux_agg[,"effect"])
+  }else{
+    aggregated_effects_Pic_abi_cflux_scaled[i,] = NA
+  }
+}
+colnames(aggregated_effects_Pic_abi_cflux_scaled) = c("ph","co2","prec","temp","insol","ndep")
+
+
+aggregated_effects_Pic_abi_agpp_scaled = matrix(nrow = nrow(sites), ncol = 6)
+for(i in 1:nrow(sites)){
+  if(i %in% growth_sites_Pic_abi){
+    aux_df_Pic_abi_agpp_agg = data.frame("group" = grouping2, "effect" = abs(t(mean_effects_Pic_abi_agpp_scaled[,1:38]))[,i])
+    aggregated_effects_Pic_abi_agpp_scaled[i,] = aux_df_Pic_abi_agpp_agg[which(aux_df_Pic_abi_agpp_agg$group =="Drivers"),"effect"]/
+      sum(aux_df_Pic_abi_agpp_agg[,"effect"])
+  }else{
+    aggregated_effects_Pic_abi_agpp_scaled[i,] = NA
+  }
+}
+colnames(aggregated_effects_Pic_abi_agpp_scaled) = c("ph","co2","prec","temp","insol","ndep")
+
+#### Fag syl ####
+
+
+
+aggregated_effects_Fag_syl_cpool_scaled = matrix(nrow = nrow(sites), ncol = 6)
+for(i in 1:nrow(sites)){
+  if(i %in% growth_sites_Fag_syl){
+    aux_df_Fag_syl_cpool_agg = data.frame("group" = grouping2, "effect" = abs(t(mean_effects_Fag_syl_cpool_scaled[,1:38]))[ordering_fag_syl,i])
+    aggregated_effects_Fag_syl_cpool_scaled[i,] = aux_df_Fag_syl_cpool_agg[which(aux_df_Fag_syl_cpool_agg$group =="Drivers"),"effect"]/
+      sum(aux_df_Fag_syl_cpool_agg[,"effect"])
+  }else{
+    aggregated_effects_Fag_syl_cpool_scaled[i,] = NA
+  }
+}
+colnames(aggregated_effects_Fag_syl_cpool_scaled) = c("ph","co2","prec","temp","insol","ndep")
+
+
+aggregated_effects_Fag_syl_cflux_scaled = matrix(nrow = nrow(sites), ncol = 6)
+for(i in 1:nrow(sites)){
+  if(i %in% growth_sites_Fag_syl){
+    aux_df_Fag_syl_cflux_agg = data.frame("group" = grouping2, "effect" = abs(t(mean_effects_Fag_syl_cflux_scaled[,1:38]))[ordering_fag_syl,i])
+    aggregated_effects_Fag_syl_cflux_scaled[i,] = aux_df_Fag_syl_cflux_agg[which(aux_df_Fag_syl_cflux_agg$group =="Drivers"),"effect"]/
+      sum(aux_df_Fag_syl_cflux_agg[,"effect"])
+  }else{
+    aggregated_effects_Fag_syl_cflux_scaled[i,] = NA
+  }
+}
+colnames(aggregated_effects_Fag_syl_cflux_scaled) = c("ph","co2","prec","temp","insol","ndep")
+
+
+aggregated_effects_Fag_syl_agpp_scaled = matrix(nrow = nrow(sites), ncol = 6)
+for(i in 1:nrow(sites)){
+  if(i %in% growth_sites_Fag_syl){
+    aux_df_Fag_syl_agpp_agg = data.frame("group" = grouping2, "effect" = abs(t(mean_effects_Fag_syl_agpp_scaled[,1:38]))[ordering_fag_syl,i])
+    aggregated_effects_Fag_syl_agpp_scaled[i,] = aux_df_Fag_syl_agpp_agg[which(aux_df_Fag_syl_agpp_agg$group =="Drivers"),"effect"]/
+      sum(aux_df_Fag_syl_agpp_agg[,"effect"])
+  }else{
+    aggregated_effects_Fag_syl_agpp_scaled[i,] = NA
+  }
+}
+colnames(aggregated_effects_Fag_syl_agpp_scaled) = c("ph","co2","prec","temp","insol","ndep")
+
+### Pin syl ###
+
+
+aggregated_effects_Pin_syl_cpool_scaled = matrix(nrow = nrow(sites), ncol = 6)
+for(i in 1:nrow(sites)){
+  if(i %in% growth_sites_Pin_syl){
+    aux_df_Pin_syl_cpool_agg = data.frame("group" = grouping2, "effect" = abs(t(mean_effects_Pin_syl_cpool_scaled[,1:38]))[ordering_pin_syl,i])
+    aggregated_effects_Pin_syl_cpool_scaled[i,] = aux_df_Pin_syl_cpool_agg[which(aux_df_Pin_syl_cpool_agg$group =="Drivers"),"effect"]/
+      sum(aux_df_Pin_syl_cpool_agg[,"effect"])
+  }else{
+    aggregated_effects_Pin_syl_cpool_scaled[i,] = NA
+  }
+}
+colnames(aggregated_effects_Pin_syl_cpool_scaled) = c("ph","co2","prec","temp","insol","ndep")
+
+
+aggregated_effects_Pin_syl_cflux_scaled = matrix(nrow = nrow(sites), ncol = 6)
+for(i in 1:nrow(sites)){
+  if(i %in% growth_sites_Pin_syl){
+    aux_df_Pin_syl_cflux_agg = data.frame("group" = grouping2, "effect" = abs(t(mean_effects_Pin_syl_cflux_scaled[,1:38]))[ordering_pin_syl,i])
+    aggregated_effects_Pin_syl_cflux_scaled[i,] = aux_df_Pin_syl_cflux_agg[which(aux_df_Pin_syl_cflux_agg$group =="Drivers"),"effect"]/
+      sum(aux_df_Pin_syl_cflux_agg[,"effect"])
+  }else{
+    aggregated_effects_Pin_syl_cflux_scaled[i,] = NA
+  }
+}
+colnames(aggregated_effects_Pin_syl_cflux_scaled) = c("ph","co2","prec","temp","insol","ndep")
+
+
+aggregated_effects_Pin_syl_agpp_scaled = matrix(nrow = nrow(sites), ncol = 6)
+for(i in 1:nrow(sites)){
+  if(i %in% growth_sites_Pin_syl){
+    aux_df_Pin_syl_agpp_agg = data.frame("group" = grouping2, "effect" = abs(t(mean_effects_Pin_syl_agpp_scaled[,1:38]))[ordering_pin_syl,i])
+    aggregated_effects_Pin_syl_agpp_scaled[i,] = aux_df_Pin_syl_agpp_agg[which(aux_df_Pin_syl_agpp_agg$group =="Drivers"),"effect"]/
+      sum(aux_df_Pin_syl_agpp_agg[,"effect"])
+  }else{
+    aggregated_effects_Pin_syl_agpp_scaled[i,] = NA
+  }
+}
+colnames(aggregated_effects_Pin_syl_agpp_scaled) = c("ph","co2","prec","temp","insol","ndep")
+
+### Mixed stands ###
+
+mean_effects_mixed_cpool = effects_mixed[["cpool"]][["complete"]]
+growth_sites_mixed = which(mean_effects_mixed_cpool[,74]/200 > 2)
+mean_effects_mixed_cpool = mean_effects_mixed_cpool
+mean_effects_mixed_cpool_scaled = remap_paramters(mean_effects_mixed_cpool, mixed_results$weight_mapping, mixed_results$position_mapping)
+
+aggregated_effects_mixed_cpool_scaled = matrix(nrow = nrow(sites), ncol = 6)
+for(i in 1:nrow(sites)){
+  if(i %in% growth_sites_mixed){
+    aux_df_mixed_cpool_agg = data.frame("group" = grouping2, "effect" = abs(t(mean_effects_mixed_cpool_scaled[,1:38]))[ordering_mixed,i])
+    aggregated_effects_mixed_cpool_scaled[i,] =  aux_df_mixed_cpool_agg$effect[which(aux_df_mixed_cpool_agg$group == "Drivers")]/
+      sum(aux_df_mixed_cpool_agg$effect)
+  }
+  else{
+    aggregated_effects_mixed_cpool_scaled[i,] = NA
+  }
+}
+colnames(aggregated_effects_mixed_cpool_scaled) = c("ph","co2","prec","temp","insol","ndep")
+
+
+mean_effects_mixed_cflux = effects_mixed[["cflux"]][["complete"]]
+mean_effects_mixed_cflux = mean_effects_mixed_cflux
+mean_effects_mixed_cflux_scaled = remap_paramters(mean_effects_mixed_cflux, mixed_results$weight_mapping, mixed_results$position_mapping)
+
+
+aggregated_effects_mixed_cflux_scaled = matrix(nrow = nrow(sites), ncol = 6)
+for(i in 1:nrow(sites)){
+  if(i %in% growth_sites_mixed){
+    aux_df_mixed_cflux_agg = data.frame("group" = grouping2, "effect" = abs(t(mean_effects_mixed_cflux_scaled[,1:38]))[ordering_mixed,i])
+    aggregated_effects_mixed_cflux_scaled[i,] =  aux_df_mixed_cflux_agg$effect[which(aux_df_mixed_cflux_agg$group == "Drivers")]/
+      sum(aux_df_mixed_cflux_agg$effect)
+  }
+  else{
+    aggregated_effects_mixed_cflux_scaled[i,] = NA
+  }
+}
+colnames(aggregated_effects_mixed_cflux_scaled) = c("ph","co2","prec","temp","insol","ndep")
+
+
+mean_effects_mixed_agpp = effects_mixed[["agpp"]][["complete"]]
+mean_effects_mixed_agpp = mean_effects_mixed_agpp
+mean_effects_mixed_agpp_scaled = remap_paramters(mean_effects_mixed_agpp, mixed_results$weight_mapping, mixed_results$position_mapping)
+
+aggregated_effects_mixed_agpp_scaled = matrix(nrow = nrow(sites), ncol = 6)
+for(i in 1:nrow(sites)){
+  if(i %in% growth_sites_mixed){
+    aux_df_mixed_agpp_agg = data.frame("group" = grouping2, "effect" = abs(t(mean_effects_mixed_agpp_scaled[,1:38]))[ordering_mixed,i])
+    aggregated_effects_mixed_agpp_scaled[i,] =  aux_df_mixed_agpp_agg$effect[which(aux_df_mixed_agpp_agg$group == "Drivers")]/
+      sum(aux_df_mixed_agpp_agg$effect)
+  }
+  else{
+    aggregated_effects_mixed_agpp_scaled[i,] = NA
+  }
+}
+colnames(aggregated_effects_mixed_agpp_scaled) = c("ph","co2","prec","temp","insol","ndep")
+
+
+average_effects_cpool =   (aggregated_effects_Fag_syl_cpool_scaled +
+                             aggregated_effects_Pin_syl_cpool_scaled +
+                             aggregated_effects_Pic_abi_cpool_scaled +
+                             aggregated_effects_mixed_cpool_scaled)/4
+
+average_effects_cflux = (aggregated_effects_Fag_syl_cflux_scaled +
+                           aggregated_effects_Pin_syl_cflux_scaled +
+                           aggregated_effects_Pic_abi_cflux_scaled+
+                           aggregated_effects_mixed_cflux_scaled)/4
+
+average_effects_agpp = (aggregated_effects_Fag_syl_agpp_scaled +
+                          aggregated_effects_Pin_syl_agpp_scaled +
+                          aggregated_effects_Pic_abi_agpp_scaled +
+                          aggregated_effects_mixed_agpp_scaled)/4
+
+
+#### Plots for temperature gradient #####
 
 
 ### cpool
 
-average_effects_cpool <- cbind(average_effects_cpool, sites[["Precipitation [l/m^2]"]])
-colnames(average_effects_cpool) = c(colnames(aggregated_effects_Pic_abi_cpool_scaled), "Precipitation")
+average_effects_cpool <- cbind(average_effects_cpool, sites[["Temperature [C°]"]])
+colnames(average_effects_cpool) = c(colnames(aggregated_effects_Pic_abi_cpool_scaled), "Temperature")
 
-df_effects_cpool_prec = matrix(ncol = 4, nrow = 7)
-colnames(df_effects_cpool_prec) = c("minimum","maximum","mean","effectsize")
-for(i in 1:7){
-  print(i)
-  df_effects_cpool_prec[i,1] = min(average_effects_cpool[,i],na.rm = T)
-  df_effects_cpool_prec[i,2] = max(average_effects_cpool[,i],na.rm = T)
-  df_effects_cpool_prec[i,3] = mean(average_effects_cpool[,i],na.rm = T)
-  df_effects_cpool_prec_lm = lm(average_effects_cpool[,i] ~log(average_effects_cpool[,8]))
-  df_effects_cpool_prec[i,4] = coef(df_effects_cpool_prec_lm)[2]
+df_effects_cpool_temp = matrix(ncol = 4, nrow = 6)
+colnames(df_effects_cpool_temp) = c("minimum","maximum","mean","effectsize")
+for(i in 1:6){
+  df_effects_cpool_temp[i,1] = min(average_effects_cpool[,i], na.rm = T)
+  df_effects_cpool_temp[i,2] = max(average_effects_cpool[,i],na.rm = T)
+  df_effects_cpool_temp[i,3] = mean(average_effects_cpool[,i],na.rm = T)
+  df_effects_cpool_temp_lm = lm(average_effects_cpool[,i] ~average_effects_cpool[,7],na.action = na.omit)
+  df_effects_cpool_temp[i,4] = coef(df_effects_cpool_temp_lm)[2]
 }
-rownames(df_effects_cpool_prec)= colnames(average_effects_cpool)[1:7]
-
+rownames(df_effects_cpool_temp)= colnames(average_effects_cpool)[1:6]
 
 
 ### cflux
 
 
-average_effects_cflux <- cbind(average_effects_cflux, sites[["Precipitation [l/m^2]"]])
-colnames(average_effects_cflux) = c(colnames(aggregated_effects_Pic_abi_cflux_scaled), "Precipitation")
+average_effects_cflux <- cbind(average_effects_cflux, sites[["Temperature [C°]"]] )
+colnames(average_effects_cflux) = c(colnames(aggregated_effects_Pic_abi_cflux_scaled), "Temperature")
 
-df_effects_cflux_prec = matrix(ncol = 4, nrow = 7)
-colnames(df_effects_cflux_prec) = c("minimum","maximum","mean","effectsize")
-for(i in 1:7){
+
+df_effects_cflux_temp = matrix(ncol = 4, nrow = 6)
+colnames(df_effects_cflux_temp) = c("minimum","maximum","mean","effectsize")
+for(i in 1:6){
   print(i)
-  df_effects_cflux_prec[i,1] = min(average_effects_cflux[,i],na.rm = T)
-  df_effects_cflux_prec[i,2] = max(average_effects_cflux[,i],na.rm = T)
-  df_effects_cflux_prec[i,3] = mean(average_effects_cflux[,i],na.rm = T)
-  df_effects_cflux_prec_lm = lm(average_effects_cflux[,i] ~log(average_effects_cflux[,8]))
-  df_effects_cflux_prec[i,4] = coef(df_effects_cflux_prec_lm)[2]
+  df_effects_cflux_temp[i,1] = min(average_effects_cflux[,i],na.rm = T)
+  df_effects_cflux_temp[i,2] = max(average_effects_cflux[,i],na.rm = T)
+  df_effects_cflux_temp[i,3] = mean(average_effects_cflux[,i],na.rm = T)
+  df_effects_cflux_temp_lm = lm(average_effects_cflux[,i] ~average_effects_cflux[,7])
+  df_effects_cflux_temp[i,4] = coef(df_effects_cflux_temp_lm)[2]
 }
-rownames(df_effects_cflux_prec)= colnames(average_effects_cflux)[1:7]
+rownames(df_effects_cflux_temp)= colnames(average_effects_cflux)[1:6]
+
+
+
 
 
 ### agpp
 
-average_effects_agpp <- cbind(average_effects_agpp, sites[["Precipitation [l/m^2]"]])
-colnames(average_effects_agpp) = c(colnames(aggregated_effects_Pic_abi_agpp_scaled), "Precipitation")
+average_effects_agpp <- cbind(average_effects_agpp, sites[["Temperature [C°]"]] )
+colnames(average_effects_agpp) = c(colnames(aggregated_effects_Pic_abi_agpp_scaled), "Temperature")
 
-df_effects_agpp_prec = matrix(ncol = 4, nrow = 7)
-colnames(df_effects_agpp_prec) = c("minimum","maximum","mean","effectsize")
-for(i in 1:7){
+df_effects_agpp_temp = matrix(ncol = 4, nrow = 6)
+colnames(df_effects_agpp_temp) = c("minimum","maximum","mean","effectsize")
+for(i in 1:6){
   print(i)
-  df_effects_agpp_prec[i,1] = min(average_effects_agpp[,i],na.rm = T)
-  df_effects_agpp_prec[i,2] = max(average_effects_agpp[,i],na.rm = T)
-  df_effects_agpp_prec[i,3] = mean(average_effects_agpp[,i],na.rm = T)
-  df_effects_agpp_prec_lm = lm(average_effects_agpp[,i] ~ log(average_effects_agpp[,8]))
-  df_effects_agpp_prec[i,4] = coef(df_effects_agpp_prec_lm)[2]
+  df_effects_agpp_temp[i,1] = min(average_effects_agpp[,i],na.rm = T)
+  df_effects_agpp_temp[i,2] = max(average_effects_agpp[,i],na.rm = T)
+  df_effects_agpp_temp[i,3] = mean(average_effects_agpp[,i],na.rm = T)
+  df_effects_agpp_temp_lm = lm(average_effects_agpp[,i] ~average_effects_agpp[,7])
+  df_effects_agpp_temp[i,4] = coef(df_effects_agpp_temp_lm)[2]
 }
-rownames(df_effects_agpp_prec)= colnames(average_effects_agpp)[1:7]
+rownames(df_effects_agpp_temp)= colnames(average_effects_agpp)[1:6]
+
+
+pdf("Figures/Changing_uncertainty_cflux_driver.pdf", width = 10, height = 10)
+plot(1,xlim=c(-0.3, max(df_effects_cflux_temp[,4])*100)*1.2,
+     ylab = "", xlab = "", xaxt = "n", yaxt = 'n',  ylim = c(1,6),bty="n", type = "n")
+par(xpd =T)
+text(x = -0.2, y = 1:6, rownames(df_effects_cflux_temp), font =2, cex = 1.5, pos =2)
+par(xpd =F)
+abline(v = -0.2)
+abline(v =0)
+for(i in 1:6){
+  arrows(x0 = 0, x1 = df_effects_cflux_temp[i,4]*100, y0 = i, y1=i, lwd =3, length = 0.1)
+}
+axis(side = 1, at = seq(from = -0.2, to = 0.6,length.out = 5))
+mtext("Change in uncertatinty contributions on a temperature gradient [%/°C]",side =1,line = 2.5, cex =1.5)
+
+dev.off()
+
+
+pdf("Figures/Changing_uncertainty_agpp_driver.pdf", width = 10, height = 10)
+plot(1,xlim=c(min(df_effects_agpp_temp[,4]*100)*1.7, max(df_effects_agpp_temp[,4])*100)*1.2,
+     ylab = "", xlab = "", xaxt = "n", yaxt = 'n',  ylim = c(1,6),bty="n", type = "n")
+par(xpd =T)
+text(x = -0.8, y = 1:6, rownames(df_effects_agpp_temp), font =2, cex = 1.5, pos =2)
+par(xpd =F)
+abline(v = -0.8)
+abline(v =0)
+for(i in 1:6){
+  arrows(x0 = 0, x1 = df_effects_agpp_temp[i,4]*100, y0 = i, y1=i, lwd =3, length = 0.1)
+}
+axis(side = 1, at = seq(from = -0.8, to = 2.4,length.out = 5))
+mtext("Change in uncertatinty contributions on a temperature gradient [%/°C]",side =1,line = 2.5, cex =1.5)
+
+dev.off()
 
 
 
+pdf("Figures/Changing_uncertainty_cpool_driver.pdf", width = 10, height = 10)
+plot(1,xlim=c(min(df_effects_cpool_temp[,4]*100)*1.5, max(df_effects_cpool_temp[,4])*100)*1.2,
+     ylab = "", xlab = "", xaxt = "n", yaxt = 'n',  ylim = c(1,6),bty="n", type = "n")
+par(xpd =T)
+text(x = -1, y = 1:6, rownames(df_effects_cpool_temp), font =2, cex = 1.5, pos =2)
+par(xpd =F)
+abline(v = -1)
+abline(v =0)
+for(i in 1:6){
+  arrows(x0 = 0, x1 = df_effects_cpool_temp[i,4]*100, y0 = i, y1=i, lwd =3, length = 0.1)
+}
+axis(side = 1, at = seq(from = -1, to = 2,length.out = 7))
+mtext("Change in uncertatinty contributions on a temperature gradient [%/°C]",side =1,line = 2.5, cex =1.5)
+
+dev.off()
 
 
 

@@ -16,12 +16,12 @@
 /Calculation_effect_sizes/Linear_Regressions_mixed_composition.R
 /Plotting/drivers_sensitivity.R
 /Plotting/radar_zones.R
-/Plotting/Figues_carbon_balance_country_barplot.R
-/Plotting/Figues_carbon_balance_per_country.R
-/Plotting/Figues_community_composition.R
-/ParameterMetaData/Synthese\s Parameter\s Ranges\s -\s Common.csv
-/ParameterMetaData/Synthese\s Parameter\s Ranges\s -\s Drivers.csv
-/ParameterMetaData/Synthese\s Parameter\s Ranges\s -\s Species-Specific.csv
+/Plotting/Figures_carbon_balance_country_barplot.R
+/Plotting/Figures_carbon_balance_per_country.R
+/Plotting/Figure_community_composition.R
+/ParameterMetaData/Synthese Parameter Ranges - Common.csv
+/ParameterMetaData/Synthese Parameter Ranges - Drivers.csv
+/ParameterMetaData/Synthese Parameter Ranges - Species-Specific.csv
 /ParameterMetaData/SyntheseParameterRanges.csv
 /ParameterMetaData/SyntheseParameterRanges2.csv
 
@@ -33,3 +33,6 @@
 /EnvironmentalData/env_data_old.rds
 /EnvironmentalData/ph_values.rds
 
+/Runs_results/*
+Get_ouputs_only.R
+Plotting/Make_temperature_map.R
