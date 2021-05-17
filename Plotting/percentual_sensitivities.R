@@ -1,5 +1,5 @@
 # function to rescale effects from zero to one
-rescaling <- function(x) {(x-min(x))/(max(x)-min(x))}
+rescaling <- function(x) {(x-min(x))/(max(x)-min(x))-0.5}
 
 # function to rescale effects from 0 to 1
 rescaling_abs <- function(x) {abs(x)/max(abs(x))}
@@ -105,11 +105,11 @@ order_to_ranges_fag_syl= order_to_ranges_fag_syl[which(!is.na(order_to_ranges_fa
 
 ### Loading the results of the linear regressions ###
 
-effects_Pic_abi = readRDS("LPJrunTest/Results/Pic_abi_effects_lin.rds")
+effects_Pic_abi = readRDS("LPJrunTest/Results/Pic_abi_effects_lin2.rds")
 
-effects_Fag_syl = readRDS("LPJrunTest/Results/Fag_syl_effects_lin.rds")
+effects_Fag_syl = readRDS("LPJrunTest/Results/Fag_syl_effects_lin2.rds")
 
-effects_Pin_syl = readRDS("LPJrunTest/Results/Pin_syl_effects_lin.rds")
+effects_Pin_syl = readRDS("LPJrunTest/Results/Pin_syl_effects_lin2.rds")
 
 effects_mixed = readRDS("LPJrunTest/Results/mixed_effects_lin.rds")
 
@@ -347,11 +347,9 @@ main_sensi_Pin_syl_agpp = get_sensi_flux(uncertainties = effects_Pin_syl[["agpp"
 
 #### Analysis for mixed ####
 drivernames  = paste0("run_",c("co2","ndep","insol","temp","ph","prec"),"_change")
-results =  readRDS(paste0("./../Results_sensi/Mixed_0.25_42.25.rds"))
-parametermixed = readRDS("ParameterMetaData/Parameter_mixed.rds")
-parameternames_ordered_mixed = names(unlist(results[[1]]@runInfo$parameterList)[which(names(unlist(results[[1]]@runInfo$parameterList)) %in% c(as.character(parametermixed$NameRLPJ),
-                                                                                                                                               drivernames))])
-rm(results)
+
+parameternames_ordered_mixed = readRDS("ParameterMetaData/parameternames_ordered_mixed.rds")
+
 parameternames_ordered_mixed_try =  substring(parameternames_ordered_mixed,regexpr("_", parameternames_ordered_mixed) + 1)
 new_noisy = c("syl_","abi_","leaved_","tolerant_","tree_","intolerant_")
 for(i in 1:length(new_noisy)){
@@ -547,10 +545,25 @@ grouping2 = grouping[order(grouping)]
 names_ordered = gsub(" ","",names[order(grouping)])
 
 
+parameters = readRDS("ParameterMetaData/Parameter_list.rds")
+drivers = c("co2","ndep","insol","temp","ph","prec")
+
+variablenames = c(as.character(parameters$Pic_abi[,"NameRLPJ"]),drivers)
+variablenames2 = substring(variablenames,regexpr("_", variablenames) + 1)
+noisy_things = c("intolerant","tolerant","tree","abi","change","_","syl","leaved")
+for(i in 1:length(noisy_things)){
+  variablenames2 = gsub(noisy_things[i],"",variablenames2)
+}
+
+
+
+
 order_fag_syl = match(names_ordered,gsub("change","",names(main_sensi_Fag_syl_agpp)))
 order_pic_abi = match(names_ordered,gsub("change","",names(main_sensi_Pic_abi_agpp)))
 order_pin_syl = match(names_ordered,gsub("change","",names(main_sensi_Pin_syl_agpp)))
 order_mixed = match(names_ordered,gsub("change","",names(main_sensi_mixed_agpp)))
+
+
 
 
 mean_sensi_abs = data.frame("Group" = grouping2,
@@ -627,7 +640,7 @@ plot(y = rep(0,39),x=1:39,
      ylim = c(min(c(mean_sensi_abs$cpool_fag_syl,mean_sensi_abs$cpool_pic_abi,mean_sensi_abs$cpool_pin_syl,
                     mean_sensi_abs$cpool_mixed))*1.1,max(c(mean_sensi_abs$cpool_fag_syl,mean_sensi_abs$cpool_pic_abi,mean_sensi_abs$cpool_pin_syl,
                                                            mean_sensi_abs$cpool_mixed))*1.1), cex.main = 1.5)
-mtext("Factorial sensitivities [%]", side =2, cex =1., line = 2.5)
+mtext("Percentual sensitivities [%]", side =2, cex =1.2, line = 2.5)
 barplot(height = apply(rbind(mean_sensi_parameters$cpool_fag_syl,mean_sensi_parameters$cpool_pic_abi,mean_sensi_parameters$cpool_pin_syl,
                              mean_sensi_parameters$cpool_mixed),2,mean),
         col = as.vector(sapply(FUN = t_col, X= colors_full, percent = 65)), add = T,axes = F,
@@ -647,7 +660,7 @@ points(y = apply(rbind(mean_sensi_parameters$cpool_fag_syl,mean_sensi_parameters
 axis(1, at = 1:39, labels = rep("",39),srt = 45, las =2 , pos = 0)
 axis(2, at = round(seq(min(c(mean_sensi_abs$cpool_fag_syl,mean_sensi_abs$cpool_pic_abi,mean_sensi_abs$cpool_pin_syl,
                              mean_sensi_abs$cpool_mixed))*1.1,max(c(mean_sensi_abs$cpool_fag_syl,mean_sensi_abs$cpool_pic_abi,mean_sensi_abs$cpool_pin_syl,
-                               mean_sensi_abs$cpool_mixed))*1.1,length.out = 10),2), las = 2, line = -0.5)
+                               mean_sensi_abs$cpool_mixed))*1.1,length.out = 5),1), las = 2, line = -0.5, cex.axis = 1.5)
 barplot(height = apply(rbind(mean_sensi_drivers$cpool_fag_syl,mean_sensi_drivers$cpool_pic_abi,mean_sensi_drivers$cpool_pin_syl,
                              mean_sensi_drivers$cpool_mixed),2,mean),
         col = as.vector(sapply(FUN = t_col, X= rep("gold2",6), percent = 65)),
@@ -688,7 +701,7 @@ plot(y = rep(0,39),x=1:39,
      ylim = c(min(c(mean_sensi_abs$cflux_fag_syl,mean_sensi_abs$cflux_pic_abi,mean_sensi_abs$cflux_pin_syl,
                     mean_sensi_abs$cflux_mixed))*1.1,max(c(mean_sensi_abs$cflux_fag_syl,mean_sensi_abs$cflux_pic_abi,mean_sensi_abs$cflux_pin_syl,
                                                            mean_sensi_abs$cflux_mixed))*1.1))
-mtext("Factorial sensitivities [%]", side =2, cex =1., line = 2.5)
+mtext("Percentual sensitivities [%]", side =2, cex =1.2, line = 2.5)
 barplot(height = apply(rbind(mean_sensi_parameters$cflux_fag_syl,mean_sensi_parameters$cflux_pic_abi,mean_sensi_parameters$cflux_pin_syl,
                              mean_sensi_parameters$cflux_mixed),2,mean),
         col = as.vector(sapply(FUN = t_col, X= colors_full, percent = 65)), add = T,axes = F,
@@ -708,7 +721,7 @@ points(y = apply(rbind(mean_sensi_parameters$cflux_fag_syl,mean_sensi_parameters
 axis(1, at = 1:39, labels = rep("",39),srt = 45, las =2 , pos = 0)
 axis(2, at = round(seq(min(c(mean_sensi_abs$cflux_fag_syl,mean_sensi_abs$cflux_pic_abi,mean_sensi_abs$cflux_pin_syl,
                              mean_sensi_abs$cflux_mixed))*1.1,max(c(mean_sensi_abs$cflux_fag_syl,mean_sensi_abs$cflux_pic_abi,mean_sensi_abs$cflux_pin_syl,
-                                                                    mean_sensi_abs$cflux_mixed))*1.1,length.out = 10),2), las = 2, line = -0.5)
+                                                                    mean_sensi_abs$cflux_mixed))*1.1,length.out = 5),1), las = 2, line = -0.5, cex.axis = 1.5)
 barplot(height = apply(rbind(mean_sensi_drivers$cflux_fag_syl,mean_sensi_drivers$cflux_pic_abi,mean_sensi_drivers$cflux_pin_syl,
                              mean_sensi_drivers$cflux_mixed),2,mean),
         col = as.vector(sapply(FUN = t_col, X= rep("gold2",6), percent = 65)),
@@ -730,7 +743,7 @@ points(y = apply(rbind(mean_sensi_drivers$cflux_fag_syl,mean_sensi_drivers$cflux
 ablineclip(v = 33,col = alpha("black",0.7),y1 = min(c(mean_sensi_abs$cflux_fag_syl,mean_sensi_abs$cflux_pic_abi,mean_sensi_abs$cflux_pin_syl,
                                                       mean_sensi_abs$cflux_mixed))*1.1)
 par(xpd =T)
-legend(x = 40, y = 1.1,
+legend(x = 40, y = 0.6,
        legend = c("Fag. syl.","Pic. abi.",'Pin. syl.',"Mixed",'Mean Mono'),
        col = c('darkgreen', 'darkblue','brown', "purple",'black'), bty = 'n',
        title = as.expression(bquote(italic(bold("Species")))),
@@ -747,7 +760,7 @@ plot(y = rep(0,39),x=1:39,
      ylim = c(min(c(mean_sensi_abs$agpp_fag_syl,mean_sensi_abs$agpp_pic_abi,mean_sensi_abs$agpp_pin_syl,
                     mean_sensi_abs$agpp_mixed))*1.1,max(c(mean_sensi_abs$agpp_fag_syl,mean_sensi_abs$agpp_pic_abi,mean_sensi_abs$agpp_pin_syl,
                                                            mean_sensi_abs$agpp_mixed))*1.1))
-mtext("Factorial sensitivities [%]", side =2, cex =1., line = 2.5)
+mtext("Percentual sensitivities [%]", side =2, cex =1.2, line = 2.5)
 barplot(height = apply(rbind(mean_sensi_parameters$agpp_fag_syl,mean_sensi_parameters$agpp_pic_abi,mean_sensi_parameters$agpp_pin_syl,
                              mean_sensi_parameters$agpp_mixed),2,mean),
         col = as.vector(sapply(FUN = t_col, X= colors_full, percent = 65)), add = T,axes = F,
@@ -767,7 +780,7 @@ points(y = apply(rbind(mean_sensi_parameters$agpp_fag_syl,mean_sensi_parameters$
 axis(1, at = 1:39, labels = rep("",39),srt = 45, las =2 , pos = 0)
 axis(2, at = round(seq(min(c(mean_sensi_abs$agpp_fag_syl,mean_sensi_abs$agpp_pic_abi,mean_sensi_abs$agpp_pin_syl,
                              mean_sensi_abs$agpp_mixed))*1.1,max(c(mean_sensi_abs$agpp_fag_syl,mean_sensi_abs$agpp_pic_abi,mean_sensi_abs$agpp_pin_syl,
-                                                                    mean_sensi_abs$agpp_mixed))*1.1,length.out = 10),2), las = 2, line = -0.5)
+                                                                    mean_sensi_abs$agpp_mixed))*1.1,length.out = 5),1), las = 2, line = -0.5, cex.axis =1.5)
 barplot(height = apply(rbind(mean_sensi_drivers$agpp_fag_syl,mean_sensi_drivers$agpp_pic_abi,mean_sensi_drivers$agpp_pin_syl,
                              mean_sensi_drivers$agpp_mixed),2,mean),
         col = as.vector(sapply(FUN = t_col, X= rep("gold2",6), percent = 65)),
@@ -796,8 +809,8 @@ plot(y = rep(0,39),x=1:39,
      col = c(rep("white",33)),xaxt='n', bty="n", yaxt = 'n', cex.axis =2,
      ylim = c(-0.01,0.01), cex.main = 1.5)
 par(xpd = T)
-text(x = 1:39-0.5, y = 0.01, c(as.character(mean_sensi_parameters$Names),"",as.character(mean_sensi_drivers$Names)),srt = 270,
-     adj = c(0.0,0.), cex =1.5)
+text(x = 1:39-0.25, y = 0.01, c(as.character(mean_sensi_parameters$Names),"",as.character(mean_sensi_drivers$Names)),srt = 90,
+     adj = c(1,0.), cex =1.5)
 par(xpd = F)
 
 dev.off()

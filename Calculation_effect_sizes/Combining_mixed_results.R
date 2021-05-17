@@ -17,10 +17,6 @@ effects_cpool_climate_change = matrix(ncol =74, nrow = 200)
 effects_cpool_complete = matrix(ncol =74, nrow = 200)
 effects_cpool_steady_climate = matrix(ncol =74, nrow = 200)
 
-effects_lai_climate_change = matrix(ncol =74, nrow = 200)
-effects_lai_complete = matrix(ncol =74, nrow = 200)
-effects_lai_steady_climate = matrix(ncol =74, nrow = 200)
-
 effects_agpp_climate_change = matrix(ncol =74, nrow = 200)
 effects_agpp_complete = matrix(ncol =74, nrow = 200)
 effects_agpp_steady_climate = matrix(ncol =74, nrow = 200)
@@ -33,10 +29,6 @@ effects_cpool_rf_climate_change = matrix(ncol =74, nrow = 200)
 effects_cpool_rf_complete = matrix(ncol =74, nrow = 200)
 effects_cpool_rf_steady_climate = matrix(ncol =74, nrow = 200)
 
-effects_lai_rf_climate_change = matrix(ncol =74, nrow = 200)
-effects_lai_rf_complete = matrix(ncol =74, nrow = 200)
-effects_lai_rf_steady_climate = matrix(ncol =74, nrow = 200)
-
 effects_agpp_rf_climate_change = matrix(ncol =74, nrow = 200)
 effects_agpp_rf_complete = matrix(ncol =74, nrow = 200)
 effects_agpp_rf_steady_climate = matrix(ncol =74, nrow = 200)
@@ -46,10 +38,6 @@ effects_agpp_rf_steady_climate = matrix(ncol =74, nrow = 200)
 interactions_cflux_steady_climate = list()
 interactions_cflux_complete = list()
 interactions_cflux_climate_change = list()
-
-interactions_lai_steady_climate = list()
-interactions_lai_complete = list()
-interactions_lai_climate_change = list()
 
 interactions_cpool_steady_climate = list()
 interactions_cpool_complete = list()
@@ -104,49 +92,40 @@ for(i in 1:length(lower_bounds)){
     interactions_agpp_complete[[lower_bounds[i]+j-1]] = results_carbon[[j]][["agpp_interactions"]][['complete']]
     interactions_agpp_steady_climate[[lower_bounds[i]+j-1]] = results_carbon[[j]][["agpp_interactions"]][['steady_climate']]
 
-    if(length(results_lai[[j]][["lai"]][["steady_climate"]])==1){
-      effects_lai_steady_climate[lower_bounds[i]+j-1,] = NA
-      interactions_lai_steady_climate[[lower_bounds[i]+j-1]] = NA
-    }
-    else{
-      effects_lai_steady_climate[lower_bounds[i]+j-1,] = results_lai[[j]][["lai"]][["steady_climate"]]
-      effects_lai_rf_steady_climate[lower_bounds[i]+j-1,] = results_lai[[j]][["lai_rf"]][["steady_climate"]]
-      interactions_lai_steady_climate[[lower_bounds[i]+j-1]] = results_lai[[j]][["lai_interactions"]][['steady_climate']]
-    }
-
-    if(length(results_lai[[j]][["lai"]][["climate_change"]])==1){
-      effects_lai_climate_change[lower_bounds[i]+j-1,] = NA
-      interactions_lai_climate_change[[lower_bounds[i]+j-1]] = NA
-    }
-    else{
-      effects_lai_climate_change[lower_bounds[i]+j-1,] = results_lai[[j]][["lai"]][["climate_change"]]
-      effects_lai_rf_climate_change[lower_bounds[i]+j-1,] = results_lai[[j]][["lai_rf"]][["climate_change"]]
-      interactions_lai_climate_change[[lower_bounds[i]+j-1]] = results_lai[[j]][["lai_interactions"]][['climate_change']]
-    }
-
-    if(length(results_lai[[j]][["lai"]][["complete"]])==1){
-      effects_lai_complete[lower_bounds[i]+j-1,] = NA
-      interactions_lai_complete[[lower_bounds[i]+j-1]] = NA
-    }
-    else{
-      effects_lai_complete[lower_bounds[i]+j-1,] = results_lai[[j]][["lai"]][["complete"]]
-      effects_lai_rf_complete[lower_bounds[i]+j-1,] = results_lai[[j]][["lai_rf"]][["complete"]]
-      interactions_lai_complete[[lower_bounds[i]+j-1]] = results_lai[[j]][["lai_interactions"]][['complete']]
-    }
+    # if(length(results_lai[[j]][["lai"]][["steady_climate"]])==1){
+    #   effects_lai_steady_climate[lower_bounds[i]+j-1,] = NA
+    #   interactions_lai_steady_climate[[lower_bounds[i]+j-1]] = NA
+    # }
+    # else{
+    #   effects_lai_steady_climate[lower_bounds[i]+j-1,] = results_lai[[j]][["lai"]][["steady_climate"]]
+    #   effects_lai_rf_steady_climate[lower_bounds[i]+j-1,] = results_lai[[j]][["lai_rf"]][["steady_climate"]]
+    #   interactions_lai_steady_climate[[lower_bounds[i]+j-1]] = results_lai[[j]][["lai_interactions"]][['steady_climate']]
+    # }
+    #
+    # if(length(results_lai[[j]][["lai"]][["climate_change"]])==1){
+    #   effects_lai_climate_change[lower_bounds[i]+j-1,] = NA
+    #   interactions_lai_climate_change[[lower_bounds[i]+j-1]] = NA
+    # }
+    # else{
+    #   effects_lai_climate_change[lower_bounds[i]+j-1,] = results_lai[[j]][["lai"]][["climate_change"]]
+    #   effects_lai_rf_climate_change[lower_bounds[i]+j-1,] = results_lai[[j]][["lai_rf"]][["climate_change"]]
+    #   interactions_lai_climate_change[[lower_bounds[i]+j-1]] = results_lai[[j]][["lai_interactions"]][['climate_change']]
+    # }
+    #
+    # if(length(results_lai[[j]][["lai"]][["complete"]])==1){
+    #   effects_lai_complete[lower_bounds[i]+j-1,] = NA
+    #   interactions_lai_complete[[lower_bounds[i]+j-1]] = NA
+    # }
+    # else{
+    #   effects_lai_complete[lower_bounds[i]+j-1,] = results_lai[[j]][["lai"]][["complete"]]
+    #   effects_lai_rf_complete[lower_bounds[i]+j-1,] = results_lai[[j]][["lai_rf"]][["complete"]]
+    #   interactions_lai_complete[[lower_bounds[i]+j-1]] = results_lai[[j]][["lai_interactions"]][['complete']]
+    # }
   }
 }
 
 
-result_list = list("lai" = list("steady_climate" = effects_lai_steady_climate,
-                                 "climate_change" = effects_lai_climate_change,
-                                 "complete" = effects_lai_complete),
-                   "lai_rf" = list("steady_climate" = effects_lai_rf_steady_climate,
-                                    "climate_change" = effects_lai_rf_climate_change,
-                                    "complete" = effects_lai_rf_complete),
-                   "lai_interactions" = list("steady_climate" = interactions_lai_steady_climate,
-                                              "climate_change" = interactions_lai_climate_change,
-                                              "complete" = interactions_lai_complete),
-                  "agpp" = list("steady_climate" = effects_agpp_steady_climate,
+result_list = list("agpp" = list("steady_climate" = effects_agpp_steady_climate,
                                 "climate_change" = effects_agpp_climate_change,
                                 "complete" = effects_agpp_complete),
                   "agpp_rf" = list("steady_climate" = effects_agpp_rf_steady_climate,
@@ -178,8 +157,8 @@ result_list = list("lai" = list("steady_climate" = effects_lai_steady_climate,
 saveRDS(result_list,"LPJrunTest/Results/Mixed_effects_lin.rds")
 
 ## read in data to derive names
-
-mixed_results =  readRDS(paste0("./../Results_sensi/Mixed_0.25_42.25.rds"))
+getwd()
+mixed_results =  readRDS(paste0("./../Results_sensi/Mixed_results/Mixed_0.25_42.25.rds"))
 
 # compare the names with the previous names to make sure, we have the right order
 # get how often parameters are used in mixed and give them weights based on how often they are there

@@ -1,6 +1,6 @@
 library(ranger)
-# function to rescale the parameters from 0 to 1
-rescaling <- function(x) {(x-min(x))/(max(x)-min(x))}
+# function to rescale the parameters from -0.5 to 0.5
+rescaling <- function(x) {(x-min(x))/(max(x)-min(x))-0.5}
 
 # functions to extract the interactions matrix from the results of a linear regression
 
@@ -87,7 +87,7 @@ get_main_effects_per_site <- function(results, parameternames){
 
       fit_rf <- ranger(overall_cpool_complete ~ . ,
                        data = as.data.frame(data_cpool_complete)[complete.cases(overall_cpool_complete),],
-                       importance = 'impurity')
+                       importance = 'impurity', num.threads = 2)
       effects_cpool_complete_rf[1,1:ncol(parameters)] = fit_rf$variable.importance
       effects_cpool_complete_rf[1,ncol(effects_cpool_complete)] = results[['cpool']][['complete']][2,1]
 
@@ -107,7 +107,7 @@ get_main_effects_per_site <- function(results, parameternames){
 
       fit_rf <- ranger(overall_cpool_climate_change ~ . ,
                        data = as.data.frame(data_cpool_climate_change)[complete.cases(overall_cpool_climate_change),],
-                       importance = 'impurity')
+                       importance = 'impurity', num.threads = 2)
       effects_cpool_climate_change_rf[1,1:ncol(parameters)] = fit_rf$variable.importance
       effects_cpool_climate_change_rf[1,ncol(effects_cpool_climate_change)] = results[['cpool']][['climate_change']][2,1]
 
@@ -127,7 +127,7 @@ get_main_effects_per_site <- function(results, parameternames){
 
       fit_rf <- ranger(overall_cpool_steady_climate ~ . ,
                        data = as.data.frame(data_cpool_steady_climate)[complete.cases(overall_cpool_steady_climate),],
-                       importance = 'impurity')
+                       importance = 'impurity', num.threads = 2)
       effects_cpool_steady_climate_rf[1,1:ncol(parameters)] = fit_rf$variable.importance
       effects_cpool_steady_climate_rf[1,ncol(effects_cpool_steady_climate)] = results[['cpool']][['steady_climate']][2,1]
 
@@ -149,7 +149,7 @@ get_main_effects_per_site <- function(results, parameternames){
 
       fit_rf <- ranger(overall_cflux_complete ~ . ,
                        data = as.data.frame(data_cflux_complete)[complete.cases(overall_cflux_complete),],
-                       importance = 'impurity')
+                       importance = 'impurity', num.threads = 2)
       effects_cflux_complete_rf[1,1:ncol(parameters)] = fit_rf$variable.importance
       effects_cflux_complete_rf[1,ncol(effects_cflux_complete)] = results[['cflux']][['complete']][2,1]
 
@@ -169,7 +169,7 @@ get_main_effects_per_site <- function(results, parameternames){
 
       fit_rf <- ranger(overall_cflux_climate_change ~ . ,
                        data = as.data.frame(data_cflux_climate_change)[complete.cases(overall_cflux_climate_change),],
-                       importance = 'impurity')
+                       importance = 'impurity', num.threads = 2)
       effects_cflux_climate_change_rf[1,1:ncol(parameters)] = fit_rf$variable.importance
       effects_cflux_climate_change_rf[1,ncol(effects_cflux_climate_change)] = results[['cflux']][['climate_change']][2,1]
 
@@ -189,7 +189,7 @@ get_main_effects_per_site <- function(results, parameternames){
 
       fit_rf <- ranger(overall_cflux_steady_climate ~ . ,
                        data = as.data.frame(data_cflux_steady_climate)[complete.cases(overall_cflux_steady_climate),],
-                       importance = 'impurity')
+                       importance = 'impurity', num.threads = 2)
       effects_cflux_steady_climate_rf[1,1:ncol(parameters)] = fit_rf$variable.importance
       effects_cflux_steady_climate_rf[1,ncol(effects_cflux_steady_climate)] = results[['cflux']][['steady_climate']][2,1]
 
@@ -210,7 +210,7 @@ get_main_effects_per_site <- function(results, parameternames){
 
       fit_rf <- ranger(overall_agpp_complete ~ . ,
                        data = as.data.frame(data_agpp_complete)[complete.cases(overall_agpp_complete),],
-                       importance = 'impurity')
+                       importance = 'impurity', num.threads = 2)
       effects_agpp_complete_rf[1,1:ncol(parameters)] = fit_rf$variable.importance
       effects_agpp_complete_rf[1,ncol(effects_agpp_complete)] = results[['agpp']][['complete']][2,1]
 
@@ -229,7 +229,7 @@ get_main_effects_per_site <- function(results, parameternames){
 
       fit_rf <- ranger(overall_agpp_climate_change ~ . ,
                        data = as.data.frame(data_agpp_climate_change)[complete.cases(overall_agpp_climate_change),],
-                       importance = 'impurity')
+                       importance = 'impurity', num.threads = 2)
       effects_agpp_climate_change_rf[1,1:ncol(parameters)] = fit_rf$variable.importance
       effects_agpp_climate_change_rf[1,ncol(effects_agpp_climate_change)] = results[['agpp']][['climate_change']][2,1]
       ### steady climate ###
@@ -247,7 +247,7 @@ get_main_effects_per_site <- function(results, parameternames){
 
       fit_rf <- ranger(overall_agpp_steady_climate ~ . ,
                        data = as.data.frame(data_agpp_steady_climate)[complete.cases(overall_agpp_steady_climate),],
-                       importance = 'impurity')
+                       importance = 'impurity', num.threads = 2)
       effects_agpp_steady_climate_rf[1,1:ncol(parameters)] = fit_rf$variable.importance
       effects_agpp_steady_climate_rf[1,ncol(effects_agpp_steady_climate)] = results[['agpp']][['steady_climate']][2,1]
 
@@ -299,183 +299,220 @@ clusterExport(cl,c("get_interaction_matrix","rescaling"),
               envir=environment())
 clusterEvalQ(cl, library("ranger"))
 
-results = list()
-j =1
-for(i in 1:10){
-  results[[j]] = readRDS(paste0("./LPJrunTest/Results/Lin_Mixed_",sites[i,"Longitudinal"],"_",sites[i,"Latitudinal"],".rds"))
-  j = j+1
-}
+# results = list()
+# j =1
+# for(i in 1:10){
+#   results[[j]] = readRDS(paste0("./LPJrunTest/Results/Lin_Mixed_",sites[i,"Longitudinal"],"_",sites[i,"Latitudinal"],".rds"))
+#   j = j+1
+# }
+#
+#
+# effect_list_mixed_1to10 <- parallel::parLapply(cl=cl, X = results, fun= get_main_effects_per_site,
+#                                         parameternames = parameternames)
+#
+# saveRDS(effect_list_mixed_1to10, file = "LPJrunTest/Results/Lin_Mixed_effects_1to10.rds")
+# rm(results)
+#
+# print("done")
+# results = list()
+# j =1
+# for(i in 11:20){
+#   results[[j]] = readRDS(paste0("./LPJrunTest/Results/Lin_Mixed_",sites[i,"Longitudinal"],"_",sites[i,"Latitudinal"],".rds"))
+#   j =j +1
+# }
 
+# effect_list_mixed_11to20 <- parallel::parLapply(cl=cl, X = results, fun= get_main_effects_per_site,
+#                                                parameternames = parameternames)
+#
+# saveRDS(effect_list_mixed_11to20, file = "LPJrunTest/Results/Lin_Mixed_effects_11to20.rds")
+# rm(results)
+# print("done")
 
-effect_list_mixed_1to10 <- parallel::parLapply(cl=cl, X = results, fun= get_main_effects_per_site,
-                                        parameternames = parameternames)
+# results = list()
 
-saveRDS(effect_list_mixed_1to10, file = "LPJrunTest/Results/Lin_Mixed_effects_1to10.rds")
-rm(results)
+# j =1
+# for(i in 21:30){
+#   results[[j]] = readRDS(paste0("./LPJrunTest/Results/Lin_Mixed_",sites[i,"Longitudinal"],"_",sites[i,"Latitudinal"],".rds"))
+#   j = j+1
+# }
+#
+# effect_list_mixed_21to30 <- parallel::parLapply(cl=cl, X = results, fun= get_main_effects_per_site,
+#                                                parameternames = parameternames)
+#
+# saveRDS(effect_list_mixed_21to30, file = "LPJrunTest/Results/Lin_Mixed_effects_21to30.rds")
+# rm(results)
+# print("done")
+# results = list()
+#
+# j =1
+# for(i in 31:40){
+#   results[[j]] = readRDS(paste0("./LPJrunTest/Results/Lin_Mixed_",sites[i,"Longitudinal"],"_",sites[i,"Latitudinal"],".rds"))
+#   j = j+1
+# }
 
-print("done")
-results = list()
-j =1
-for(i in 11:20){
-  results[[j]] = readRDS(paste0("./LPJrunTest/Results/Lin_Mixed_",sites[i,"Longitudinal"],"_",sites[i,"Latitudinal"],".rds"))
-  j =j +1
-}
+# effect_list_mixed_31to40 <- parallel::parLapply(cl=cl, X = results, fun= get_main_effects_per_site,
+#                                                parameternames = parameternames)
+#
+# saveRDS(effect_list_mixed_31to40, file = "LPJrunTest/Results/Lin_Mixed_effects_31to40.rds")
+# rm(results)
+# print("done")
 
-effect_list_mixed_11to20 <- parallel::parLapply(cl=cl, X = results, fun= get_main_effects_per_site,
-                                               parameternames = parameternames)
-
-saveRDS(effect_list_mixed_11to20, file = "LPJrunTest/Results/Lin_Mixed_effects_11to20.rds")
-rm(results)
-print("done")
-
-results = list()
-
-j =1
-for(i in 21:30){
-  results[[j]] = readRDS(paste0("./LPJrunTest/Results/Lin_Mixed_",sites[i,"Longitudinal"],"_",sites[i,"Latitudinal"],".rds"))
-  j = j+1
-}
-
-effect_list_mixed_21to30 <- parallel::parLapply(cl=cl, X = results, fun= get_main_effects_per_site,
-                                               parameternames = parameternames)
-
-saveRDS(effect_list_mixed_21to30, file = "LPJrunTest/Results/Lin_Mixed_effects_21to30.rds")
-rm(results)
-print("done")
-results = list()
-
-j =1
-for(i in 31:40){
-  results[[j]] = readRDS(paste0("./LPJrunTest/Results/Lin_Mixed_",sites[i,"Longitudinal"],"_",sites[i,"Latitudinal"],".rds"))
-  j = j+1
-}
-
-effect_list_mixed_31to40 <- parallel::parLapply(cl=cl, X = results, fun= get_main_effects_per_site,
-                                               parameternames = parameternames)
-
-saveRDS(effect_list_mixed_31to40, file = "LPJrunTest/Results/Lin_Mixed_effects_31to40.rds")
-rm(results)
-print("done")
-
-results = list()
-j =1
-for(i in 41:50){
-  results[[j]] = readRDS(paste0("./LPJrunTest/Results/Lin_Mixed_",sites[i,"Longitudinal"],"_",sites[i,"Latitudinal"],".rds"))
-  j = j+1
-}
-
-effect_list_mixed_41to50 <- parallel::parLapply(cl=cl, X = results, fun= get_main_effects_per_site,
-                                               parameternames = parameternames)
-
-saveRDS(effect_list_mixed_41to50, file = "LPJrunTest/Results/Lin_Mixed_effects_41to50.rds")
-rm(results)
-print("done")
-results = list()
-
-j = 1
-for(i in 51:60){
-  results[[j]] = readRDS(paste0("./LPJrunTest/Results/Lin_Mixed_",sites[i,"Longitudinal"],"_",sites[i,"Latitudinal"],".rds"))
-  j = j+1
-}
-
-effect_list_mixed_51to60 <- parallel::parLapply(cl=cl, X = results, fun= get_main_effects_per_site,
-                                               parameternames = parameternames)
-
-saveRDS(effect_list_mixed_51to60, file = "LPJrunTest/Results/Lin_Mixed_effects_51to60.rds")
-rm(results)
-print("done")
-results = list()
-
-j =1
-for(i in 61:70){
-  results[[j]] = readRDS(paste0("./LPJrunTest/Results/Lin_Mixed_",sites[i,"Longitudinal"],"_",sites[i,"Latitudinal"],".rds"))
-  j = j+1
-}
-
-effect_list_mixed_61to70 <- parallel::parLapply(cl=cl, X = results, fun= get_main_effects_per_site,
-                                                parameternames = parameternames)
-
-saveRDS(effect_list_mixed_61to70, file = "LPJrunTest/Results/Lin_Mixed_effects_61to70.rds")
-rm(results)
-print("done")
-results = list()
-j=1
-for(i in 71:80){
-  results[[j]] = readRDS(paste0("./LPJrunTest/Results/Lin_Mixed_",sites[i,"Longitudinal"],"_",sites[i,"Latitudinal"],".rds"))
-  j = j+1
-}
-
-effect_list_mixed_71to80 <- parallel::parLapply(cl=cl, X = results, fun= get_main_effects_per_site,
-                                                parameternames = parameternames)
-
-saveRDS(effect_list_mixed_71to80, file = "LPJrunTest/Results/Lin_Mixed_effects_71to80.rds")
-rm(results)
-print("done")
-results = list()
-j=1
-for(i in 81:90){
-  results[[j]] = readRDS(paste0("./LPJrunTest/Results/Lin_Mixed_",sites[i,"Longitudinal"],"_",sites[i,"Latitudinal"],".rds"))
-  j = j+1
-}
-
-effect_list_mixed_81to90 <- parallel::parLapply(cl=cl, X = results, fun= get_main_effects_per_site,
-                                                parameternames = parameternames)
-
-saveRDS(effect_list_mixed_81to90, file = "LPJrunTest/Results/Lin_Mixed_effects_81to90.rds")
-rm(results)
-print("done")
-results = list()
-j=1
-for(i in 91:100){
-  results[[j]] = readRDS(paste0("./LPJrunTest/Results/Lin_Mixed_",sites[i,"Longitudinal"],"_",sites[i,"Latitudinal"],".rds"))
-  j = j+1
-}
-
-effect_list_mixed_91to100 <- parallel::parLapply(cl=cl, X = results, fun= get_main_effects_per_site,
-                                                parameternames = parameternames)
-
-saveRDS(effect_list_mixed_91to100, file = "LPJrunTest/Results/Lin_Mixed_effects_91to100.rds")
-rm(results)
-print("done")
-results = list()
-j=1
-for(i in 101:110){
-  results[[j]] = readRDS(paste0("./LPJrunTest/Results/Lin_Mixed_",sites[i,"Longitudinal"],"_",sites[i,"Latitudinal"],".rds"))
-  j = j+1
-}
-
-effect_list_mixed_101to110 <- parallel::parLapply(cl=cl, X = results, fun= get_main_effects_per_site,
-                                                parameternames = parameternames)
-
-saveRDS(effect_list_mixed_101to110, file = "LPJrunTest/Results/Lin_Mixed_effects_101to110.rds")
-rm(results)
-print("done")
-results = list()
-j=1
-for(i in 111:120){
-  results[[j]] = readRDS(paste0("./LPJrunTest/Results/Lin_Mixed_",sites[i,"Longitudinal"],"_",sites[i,"Latitudinal"],".rds"))
-  j = j+1
-}
-
-effect_list_mixed_111to120 <- parallel::parLapply(cl=cl, X = results, fun= get_main_effects_per_site,
-                                                  parameternames = parameternames)
-
-saveRDS(effect_list_mixed_111to120, file = "LPJrunTest/Results/Lin_Mixed_effects_111to120.rds")
-rm(results)
-print("done")
-results = list()
-j =1
-for(i in 121:130){
-  results[[j]] = readRDS(paste0("./LPJrunTest/Results/Lin_Mixed_",sites[i,"Longitudinal"],"_",sites[i,"Latitudinal"],".rds"))
-  j = j+1
-}
-
-effect_list_mixed_121to130 <- parallel::parLapply(cl=cl, X = results, fun= get_main_effects_per_site,
-                                                  parameternames = parameternames)
-
-saveRDS(effect_list_mixed_121to130, file = "LPJrunTest/Results/Lin_Mixed_effects_121to130.rds")
-rm(results)
-print("done")
+# results = list()
+# j =1
+# for(i in 41:50){
+#   results[[j]] = readRDS(paste0("./LPJrunTest/Results/Lin_Mixed_",sites[i,"Longitudinal"],"_",sites[i,"Latitudinal"],".rds"))
+#   j = j+1
+# }
+#
+# effect_list_mixed_41to50 <- parallel::parLapply(cl=cl, X = results, fun= get_main_effects_per_site,
+#                                                parameternames = parameternames)
+#
+# saveRDS(effect_list_mixed_41to50, file = "LPJrunTest/Results/Lin_Mixed_effects_41to50.rds")
+# rm(results)
+# print("done")
+# results = list()
+#
+# j = 1
+# for(i in 51:60){
+#   results[[j]] = readRDS(paste0("./LPJrunTest/Results/Lin_Mixed_",sites[i,"Longitudinal"],"_",sites[i,"Latitudinal"],".rds"))
+#   j = j+1
+# }
+#
+# effect_list_mixed_51to60 <- parallel::parLapply(cl=cl, X = results, fun= get_main_effects_per_site,
+#                                                parameternames = parameternames)
+#
+# saveRDS(effect_list_mixed_51to60, file = "LPJrunTest/Results/Lin_Mixed_effects_51to60.rds")
+# rm(results)
+# print("done")
+# results = list()
+#
+# # j =1
+# # for(i in 61:70){
+# #   results[[j]] = readRDS(paste0("./LPJrunTest/Results/Lin_Mixed_",sites[i,"Longitudinal"],"_",sites[i,"Latitudinal"],".rds"))
+# #   j = j+1
+# # }
+# #
+# # effect_list_mixed_61to70 <- parallel::parLapply(cl=cl, X = results, fun= get_main_effects_per_site,
+# #                                                 parameternames = parameternames)
+#
+# saveRDS(effect_list_mixed_61to70, file = "LPJrunTest/Results/Lin_Mixed_effects_61to70.rds")
+# rm(results)
+# rm(effect_list_mixed_61to70)
+# print("done")
+# results = list()
+# j=1
+# for(i in 71:80){
+#   results[[j]] = readRDS(paste0("./LPJrunTest/Results/Lin_Mixed_",sites[i,"Longitudinal"],"_",sites[i,"Latitudinal"],".rds"))
+#   j = j+1
+# }
+#
+# effect_list_mixed_71to80 <- parallel::parLapply(cl=cl, X = results, fun= get_main_effects_per_site,
+#                                                 parameternames = parameternames)
+#
+# stopCluster(cl)
+# saveRDS(effect_list_mixed_71to80, file = "LPJrunTest/Results/Lin_Mixed_effects_71to80.rds")
+# rm(results)
+# rm(effect_list_mixed_71to80)
+# print("done")
+# cl <- makeCluster(11)
+# clusterExport(cl,c("get_interaction_matrix","rescaling"),
+#               envir=environment())
+# clusterEvalQ(cl, library("ranger"))
+# results = list()
+# j=1
+# for(i in 81:90){
+#   results[[j]] = readRDS(paste0("./LPJrunTest/Results/Lin_Mixed_",sites[i,"Longitudinal"],"_",sites[i,"Latitudinal"],".rds"))
+#   j = j+1
+# }
+#
+# effect_list_mixed_81to90 <- parallel::parLapply(cl=cl, X = results, fun= get_main_effects_per_site,
+#                                                 parameternames = parameternames)
+#
+# stopCluster(cl)
+# saveRDS(effect_list_mixed_81to90, file = "LPJrunTest/Results/Lin_Mixed_effects_81to90.rds")
+# rm(results)
+# rm(effect_list_mixed_81to90)
+# print("done")
+# cl <- makeCluster(11)
+# clusterExport(cl,c("get_interaction_matrix","rescaling"),
+#               envir=environment())
+# clusterEvalQ(cl, library("ranger"))
+# results = list()
+# j=1
+# for(i in 91:100){
+#   results[[j]] = readRDS(paste0("./LPJrunTest/Results/Lin_Mixed_",sites[i,"Longitudinal"],"_",sites[i,"Latitudinal"],".rds"))
+#   j = j+1
+# }
+#
+# effect_list_mixed_91to100 <- parallel::parLapply(cl=cl, X = results, fun= get_main_effects_per_site,
+#                                                 parameternames = parameternames)
+#
+# stopCluster(cl)
+# saveRDS(effect_list_mixed_91to100, file = "LPJrunTest/Results/Lin_Mixed_effects_91to100.rds")
+# rm(results)
+# rm(effect_list_mixed_91to100)
+# print("done")
+# cl <- makeCluster(11)
+# clusterExport(cl,c("get_interaction_matrix","rescaling"),
+#               envir=environment())
+# clusterEvalQ(cl, library("ranger"))
+# results = list()
+# j=1
+# for(i in 101:110){
+#   results[[j]] = readRDS(paste0("./LPJrunTest/Results/Lin_Mixed_",sites[i,"Longitudinal"],"_",sites[i,"Latitudinal"],".rds"))
+#   j = j+1
+# }
+#
+# effect_list_mixed_101to110 <- parallel::parLapply(cl=cl, X = results, fun= get_main_effects_per_site,
+#                                                 parameternames = parameternames)
+#
+# stopCluster(cl)
+# saveRDS(effect_list_mixed_101to110, file = "LPJrunTest/Results/Lin_Mixed_effects_101to110.rds")
+# rm(results)
+# rm(effect_list_mixed_101to110)
+# print("done")
+# cl <- makeCluster(11)
+# clusterExport(cl,c("get_interaction_matrix","rescaling"),
+#               envir=environment())
+# clusterEvalQ(cl, library("ranger"))
+# results = list()
+# j=1
+# for(i in 111:120){
+#   results[[j]] = readRDS(paste0("./LPJrunTest/Results/Lin_Mixed_",sites[i,"Longitudinal"],"_",sites[i,"Latitudinal"],".rds"))
+#   j = j+1
+# }
+#
+# effect_list_mixed_111to120 <- parallel::parLapply(cl=cl, X = results, fun= get_main_effects_per_site,
+#                                                   parameternames = parameternames)
+#
+# stopCluster(cl)
+# saveRDS(effect_list_mixed_111to120, file = "LPJrunTest/Results/Lin_Mixed_effects_111to120.rds")
+# rm(results)
+# rm(effect_list_mixed_111to120)
+# print("done")
+# cl <- makeCluster(11)
+# clusterExport(cl,c("get_interaction_matrix","rescaling"),
+#               envir=environment())
+# clusterEvalQ(cl, library("ranger"))
+# results = list()
+# j =1
+# for(i in 121:130){
+#   results[[j]] = readRDS(paste0("./LPJrunTest/Results/Lin_Mixed_",sites[i,"Longitudinal"],"_",sites[i,"Latitudinal"],".rds"))
+#   j = j+1
+# }
+#
+# effect_list_mixed_121to130 <- parallel::parLapply(cl=cl, X = results, fun= get_main_effects_per_site,
+#                                                   parameternames = parameternames)
+#
+# stopCluster(cl)
+# saveRDS(effect_list_mixed_121to130, file = "LPJrunTest/Results/Lin_Mixed_effects_121to130.rds")
+# rm(results)
+# rm(effect_list_mixed_121to130)
+# print("done")
+cl <- makeCluster(11)
+clusterExport(cl,c("get_interaction_matrix","rescaling"),
+              envir=environment())
+clusterEvalQ(cl, library("ranger"))
 results = list()
 j =1
 for(i in 131:140){
@@ -486,9 +523,15 @@ for(i in 131:140){
 effect_list_mixed_131to140 <- parallel::parLapply(cl=cl, X = results, fun= get_main_effects_per_site,
                                                   parameternames = parameternames)
 
+stopCluster(cl)
 saveRDS(effect_list_mixed_131to140, file = "LPJrunTest/Results/Lin_Mixed_effects_131to140.rds")
 rm(results)
+rm(effect_list_mixed_131to140)
 print("done")
+cl <- makeCluster(11)
+clusterExport(cl,c("get_interaction_matrix","rescaling"),
+              envir=environment())
+clusterEvalQ(cl, library("ranger"))
 results = list()
 j=1
 for(i in 141:150){
@@ -499,9 +542,15 @@ for(i in 141:150){
 effect_list_mixed_141to150 <- parallel::parLapply(cl=cl, X = results, fun= get_main_effects_per_site,
                                                   parameternames = parameternames)
 
+stopCluster(cl)
 saveRDS(effect_list_mixed_141to150, file = "LPJrunTest/Results/Lin_Mixed_effects_141to150.rds")
 rm(results)
+rm(effect_list_mixed_141to150)
 print("done")
+cl <- makeCluster(11)
+clusterExport(cl,c("get_interaction_matrix","rescaling"),
+              envir=environment())
+clusterEvalQ(cl, library("ranger"))
 results = list()
 j=1
 for(i in 151:160){
@@ -512,9 +561,15 @@ for(i in 151:160){
 effect_list_mixed_151to160 <- parallel::parLapply(cl=cl, X = results, fun= get_main_effects_per_site,
                                                   parameternames = parameternames)
 
+stopCluster(cl)
 saveRDS(effect_list_mixed_151to160, file = "LPJrunTest/Results/Lin_Mixed_effects_151to160.rds")
 rm(results)
+rm(effect_list_mixed_151to160)
 print("done")
+cl <- makeCluster(11)
+clusterExport(cl,c("get_interaction_matrix","rescaling"),
+              envir=environment())
+clusterEvalQ(cl, library("ranger"))
 results = list()
 j =1
 for(i in 161:170){
@@ -525,9 +580,15 @@ for(i in 161:170){
 effect_list_mixed_161to170 <- parallel::parLapply(cl=cl, X = results, fun= get_main_effects_per_site,
                                                   parameternames = parameternames)
 
+stopCluster(cl)
 saveRDS(effect_list_mixed_161to170, file = "LPJrunTest/Results/Lin_Mixed_effects_161to170.rds")
 rm(results)
+rm(effect_list_mixed_161to170)
 print("done")
+cl <- makeCluster(11)
+clusterExport(cl,c("get_interaction_matrix","rescaling"),
+              envir=environment())
+clusterEvalQ(cl, library("ranger"))
 results = list()
 j =1
 for(i in 171:180){
@@ -538,9 +599,15 @@ for(i in 171:180){
 effect_list_mixed_171to180 <- parallel::parLapply(cl=cl, X = results, fun= get_main_effects_per_site,
                                                   parameternames = parameternames)
 
+stopCluster(cl)
 saveRDS(effect_list_mixed_171to180, file = "LPJrunTest/Results/Lin_Mixed_effects_171to180.rds")
 rm(results)
+rm(effect_list_mixed_171to180)
 print("done")
+cl <- makeCluster(11)
+clusterExport(cl,c("get_interaction_matrix","rescaling"),
+              envir=environment())
+clusterEvalQ(cl, library("ranger"))
 results = list()
 j =1
 for(i in 181:190){
@@ -551,9 +618,16 @@ for(i in 181:190){
 effect_list_mixed_181to190 <- parallel::parLapply(cl=cl, X = results, fun= get_main_effects_per_site,
                                                   parameternames = parameternames)
 
+
+stopCluster(cl)
 saveRDS(effect_list_mixed_181to190, file = "LPJrunTest/Results/Lin_Mixed_effects_181to190.rds")
 rm(results)
+rm(effect_list_mixed_181to190)
 print("done")
+cl <- makeCluster(11)
+clusterExport(cl,c("get_interaction_matrix","rescaling"),
+              envir=environment())
+clusterEvalQ(cl, library("ranger"))
 results = list()
 j = 1
 for(i in 191:200){
@@ -566,6 +640,7 @@ effect_list_mixed_191to200 <- parallel::parLapply(cl=cl, X = results, fun= get_m
 
 saveRDS(effect_list_mixed_191to200, file = "LPJrunTest/Results/Lin_Mixed_effects_191to200.rds")
 rm(results)
+rm(effect_list_mixed_191to200)
 print("done")
 
 

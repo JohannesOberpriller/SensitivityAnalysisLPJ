@@ -1,6 +1,6 @@
 library(ranger)
-# function to rescale the parameters from 0 to 1
-rescaling <- function(x) {(x-min(x))/(max(x)-min(x))}
+# function to rescale the parameters from -0.5 to 0.5
+rescaling <- function(x) {(x-min(x))/(max(x)-min(x))-0.5}
 
 
 # functions to extract the interactions matrix from the results of a linear regression
@@ -113,62 +113,6 @@ get_main_effects <- function(sites, parameternames, species){
       parameters = apply(parameter_matrix, 2, rescaling)
 
       ## fitting of the linear regression and random forest to check consistency ##
-
-      #### cmass related stuff ####
-
-      ### complete ###
-
-      overall_cmass_complete = results[['cmass']][['complete']][1,]
-
-      data_cmass_complete <- cbind(overall_cmass_complete,parameters)
-      fit <- lm(overall_cmass_complete ~ (.)^2 , data = as.data.frame(data_cmass_complete))
-      coefficients = coef(fit)[-1]
-      effects_cmass_complete[i,1:ncol(parameters)] =  coefficients[1:ncol(parameters)]
-      effects_cmass_complete[i,ncol(effects_cmass_complete)] = results[['cmass']][['complete']][2,1]
-
-      interaction_matrix_cmass_complete = get_interaction_matrix(coefficients, num_parameters = 38)
-      interactions_cmass_complete[[i]] = interaction_matrix_cmass_complete
-
-      fit_rf <- ranger(overall_cmass_complete ~ . , data = as.data.frame(data_cmass_complete), importance = 'impurity')
-      effects_cmass_complete_rf[i,1:ncol(parameters)] = fit_rf$variable.importance
-      effects_cmass_complete_rf[i,ncol(effects_cmass_complete)] = results[['cmass']][['complete']][2,1]
-
-
-      ### climate change ###
-
-      overall_cmass_climate_change = results[['cmass']][['climate_change']][1,]
-
-      data_cmass_climate_change <- cbind(overall_cmass_climate_change,parameters)
-      fit <- lm(overall_cmass_climate_change ~ (.)^2 , data = as.data.frame(data_cmass_climate_change))
-      coefficients = coef(fit)[-1]
-      effects_cmass_climate_change[i,1:ncol(parameters)] =  coefficients[1:ncol(parameters)]
-      effects_cmass_climate_change[i,ncol(effects_cmass_complete)] = results[['cmass']][['climate_change']][2,1]
-
-      interaction_matrix_cmass_climate_change = get_interaction_matrix(coefficients, num_parameters = 38)
-      interactions_cmass_climate_change[[i]] = interaction_matrix_cmass_climate_change
-
-      fit_rf <- ranger(overall_cmass_climate_change ~ . , data = as.data.frame(data_cmass_climate_change), importance = 'impurity')
-      effects_cmass_climate_change_rf[i,1:ncol(parameters)] = fit_rf$variable.importance
-      effects_cmass_climate_change_rf[i,ncol(effects_cmass_climate_change)] = results[['cmass']][['climate_change']][2,1]
-
-      ### steady climate ###
-
-      overall_cmass_steady_climate= results[['cmass']][['steady_climate']][1,]
-
-      data_cmass_steady_climate <- cbind(overall_cmass_steady_climate,parameters)
-      fit <- lm(overall_cmass_steady_climate ~ (.)^2 , data = as.data.frame(data_cmass_steady_climate))
-      coefficients = coef(fit)[-1]
-      effects_cmass_steady_climate[i,1:ncol(parameters)] =  coefficients[1:ncol(parameters)]
-      effects_cmass_steady_climate[i,ncol(effects_cmass_complete)] = results[['cmass']][['steady_climate']][2,1]
-
-      interaction_matrix_cmass_steady_climate = get_interaction_matrix(coefficients, num_parameters = 38)
-      interactions_cmass_steady_climate[[i]] = interaction_matrix_cmass_steady_climate
-
-      fit_rf <- ranger(overall_cmass_steady_climate ~ . , data = as.data.frame(data_cmass_steady_climate), importance = 'impurity')
-      effects_cmass_steady_climate_rf[i,1:ncol(parameters)] = fit_rf$variable.importance
-      effects_cmass_steady_climate_rf[i,ncol(effects_cmass_steady_climate)] = results[['cmass']][['steady_climate']][2,1]
-
-
       ### cpool stuff ###
 
       ### complete ###
@@ -184,7 +128,7 @@ get_main_effects <- function(sites, parameternames, species){
       interaction_matrix_cpool_complete = get_interaction_matrix(coefficients, num_parameters = 38)
       interactions_cpool_complete[[i]] = interaction_matrix_cpool_complete
 
-      fit_rf <- ranger(overall_cpool_complete ~ ., data = as.data.frame(data_cpool_complete), importance = 'impurity')
+      fit_rf <- ranger(overall_cpool_complete ~ ., data = as.data.frame(data_cpool_complete), importance = 'impurity', num.threads = 10)
       effects_cpool_complete_rf[i,1:ncol(parameters)] = fit_rf$variable.importance
       effects_cpool_complete_rf[i,ncol(effects_cpool_complete)] = results[['cpool']][['complete']][2,1]
 
@@ -202,7 +146,7 @@ get_main_effects <- function(sites, parameternames, species){
       interaction_matrix_cpool_climate_change = get_interaction_matrix(coefficients, num_parameters = 38)
       interactions_cpool_climate_change[[i]] = interaction_matrix_cpool_climate_change
 
-      fit_rf <- ranger(overall_cpool_climate_change ~ . , data = as.data.frame(data_cpool_climate_change), importance = 'impurity')
+      fit_rf <- ranger(overall_cpool_climate_change ~ . , data = as.data.frame(data_cpool_climate_change), importance = 'impurity',num.threads = 10)
       effects_cpool_climate_change_rf[i,1:ncol(parameters)] = fit_rf$variable.importance
       effects_cpool_climate_change_rf[i,ncol(effects_cpool_climate_change)] = results[['cpool']][['climate_change']][2,1]
 
@@ -219,7 +163,7 @@ get_main_effects <- function(sites, parameternames, species){
       interaction_matrix_cpool_steady_climate = get_interaction_matrix(coefficients, num_parameters = 38)
       interactions_cpool_steady_climate[[i]] = interaction_matrix_cpool_steady_climate
 
-      fit_rf <- ranger(overall_cpool_steady_climate ~ . , data = as.data.frame(data_cpool_steady_climate), importance = 'impurity')
+      fit_rf <- ranger(overall_cpool_steady_climate ~ . , data = as.data.frame(data_cpool_steady_climate), importance = 'impurity',num.threads = 10)
       effects_cpool_steady_climate_rf[i,1:ncol(parameters)] = fit_rf$variable.importance
       effects_cpool_steady_climate_rf[i,ncol(effects_cpool_steady_climate)] = results[['cpool']][['steady_climate']][2,1]
 
@@ -238,7 +182,7 @@ get_main_effects <- function(sites, parameternames, species){
       interaction_matrix_cflux_complete = get_interaction_matrix(coefficients, num_parameters = 38)
       interactions_cflux_complete[[i]] = interaction_matrix_cflux_complete
 
-      fit_rf <- ranger(overall_cflux_complete ~ ., data = as.data.frame(data_cflux_complete), importance = 'impurity')
+      fit_rf <- ranger(overall_cflux_complete ~ ., data = as.data.frame(data_cflux_complete), importance = 'impurity',num.threads = 10)
       effects_cflux_complete_rf[i,1:ncol(parameters)] = fit_rf$variable.importance
       effects_cflux_complete_rf[i,ncol(effects_cflux_complete)] = results[['cflux']][['complete']][2,1]
       ### climate change ###
@@ -254,7 +198,7 @@ get_main_effects <- function(sites, parameternames, species){
       interaction_matrix_cflux_climate_change = get_interaction_matrix(coefficients, num_parameters = 38)
       interactions_cflux_climate_change[[i]] = interaction_matrix_cflux_climate_change
 
-      fit_rf <- ranger(overall_cflux_climate_change ~ . , data = as.data.frame(data_cflux_climate_change), importance = 'impurity')
+      fit_rf <- ranger(overall_cflux_climate_change ~ . , data = as.data.frame(data_cflux_climate_change), importance = 'impurity',num.threads = 10)
       effects_cflux_climate_change_rf[i,1:ncol(parameters)] = fit_rf$variable.importance
       effects_cflux_climate_change_rf[i,ncol(effects_cflux_climate_change)] = results[['cflux']][['climate_change']][2,1]
       ### steady climate ###
@@ -270,63 +214,9 @@ get_main_effects <- function(sites, parameternames, species){
       interaction_matrix_cflux_steady_climate = get_interaction_matrix(coefficients, num_parameters = 38)
       interactions_cflux_steady_climate[[i]] = interaction_matrix_cflux_steady_climate
 
-      fit_rf <- ranger(overall_cflux_steady_climate ~ . , data = as.data.frame(data_cflux_steady_climate), importance = 'impurity')
+      fit_rf <- ranger(overall_cflux_steady_climate ~ . , data = as.data.frame(data_cflux_steady_climate), importance = 'impurity',num.threads = 10)
       effects_cflux_steady_climate_rf[i,1:ncol(parameters)] = fit_rf$variable.importance
       effects_cflux_steady_climate_rf[i,ncol(effects_cflux_steady_climate)] = results[['cflux']][['steady_climate']][2,1]
-      ## anpp related stuff
-
-      ### complete ###
-
-      overall_anpp_complete = results[['anpp']][['complete']][1,]
-
-      data_anpp_complete <- cbind(overall_anpp_complete,parameters)
-      fit <- lm(overall_anpp_complete ~ (.)^2 , data = as.data.frame(data_anpp_complete))
-      coefficients = coef(fit)[-1]
-      effects_anpp_complete[i,1:ncol(parameters)] =  coefficients[1:ncol(parameters)]
-      effects_anpp_complete[i,ncol(effects_anpp_complete)] = results[['anpp']][['complete']][2,1]
-
-      interaction_matrix_anpp_complete = get_interaction_matrix(coefficients, num_parameters = 38)
-      interactions_anpp_complete[[i]] = interaction_matrix_anpp_complete
-
-      fit_rf <- ranger(overall_anpp_complete ~ . , data = as.data.frame(data_anpp_complete), importance = 'impurity')
-      effects_anpp_complete_rf[i,1:ncol(parameters)] = fit_rf$variable.importance
-      effects_anpp_complete_rf[i,ncol(effects_anpp_complete)] = results[['anpp']][['complete']][2,1]
-
-      ### climate change ###
-
-      overall_anpp_climate_change = results[['anpp']][['climate_change']][1,]
-
-      data_anpp_climate_change <- cbind(overall_anpp_climate_change,parameters)
-      fit <- lm(overall_anpp_climate_change ~ (.)^2 , data = as.data.frame(data_anpp_climate_change))
-      coefficients = coef(fit)[-1]
-      effects_anpp_climate_change[i,1:ncol(parameters)] =  coefficients[1:ncol(parameters)]
-      effects_anpp_climate_change[i,ncol(effects_anpp_complete)] = results[['anpp']][['climate_change']][2,1]
-
-
-      interaction_matrix_anpp_climate_change = get_interaction_matrix(coefficients, num_parameters = 38)
-      interactions_anpp_climate_change[[i]] = interaction_matrix_anpp_climate_change
-
-      fit_rf <- ranger(overall_anpp_climate_change ~ . , data = as.data.frame(data_anpp_climate_change), importance = 'impurity')
-      effects_anpp_climate_change_rf[i,1:ncol(parameters)] = fit_rf$variable.importance
-      effects_anpp_climate_change_rf[i,ncol(effects_anpp_climate_change)] = results[['anpp']][['climate_change']][2,1]
-
-      ### steady climate ###
-
-      overall_anpp_steady_climate= results[['anpp']][['steady_climate']][1,]
-
-      data_anpp_steady_climate <- cbind(overall_anpp_steady_climate,parameters)
-      fit <- lm(overall_anpp_steady_climate ~ (.)^2 , data = as.data.frame(data_anpp_steady_climate))
-      coefficients = coef(fit)[-1]
-      effects_anpp_steady_climate[i,1:ncol(parameters)] =  coefficients[1:ncol(parameters)]
-      effects_anpp_steady_climate[i,ncol(effects_anpp_complete)] = results[['anpp']][['steady_climate']][2,1]
-
-      interaction_matrix_anpp_steady_climate = get_interaction_matrix(coefficients, num_parameters = 38)
-      interactions_anpp_steady_climate[[i]] = interaction_matrix_anpp_steady_climate
-
-      fit_rf <- ranger(overall_anpp_steady_climate ~ . , data = as.data.frame(data_anpp_steady_climate), importance = 'impurity')
-      effects_anpp_steady_climate_rf[i,1:ncol(parameters)] = fit_rf$variable.importance
-      effects_anpp_steady_climate_rf[i,ncol(effects_anpp_steady_climate)] = results[['anpp']][['steady_climate']][2,1]
-
 
       ## agpp related stuff
 
@@ -343,7 +233,7 @@ get_main_effects <- function(sites, parameternames, species){
       interaction_matrix_agpp_complete = get_interaction_matrix(coefficients, num_parameters = 38)
       interactions_agpp_complete[[i]] = interaction_matrix_agpp_complete
 
-      fit_rf <- ranger(overall_agpp_complete ~ . , data = as.data.frame(data_agpp_complete), importance = 'impurity')
+      fit_rf <- ranger(overall_agpp_complete ~ . , data = as.data.frame(data_agpp_complete), importance = 'impurity',num.threads = 10)
       effects_agpp_complete_rf[i,1:ncol(parameters)] = fit_rf$variable.importance
       effects_agpp_complete_rf[i,ncol(effects_agpp_complete)] = results[['agpp']][['complete']][2,1]
       ### climate change ###
@@ -359,7 +249,7 @@ get_main_effects <- function(sites, parameternames, species){
       interaction_matrix_agpp_climate_change = get_interaction_matrix(coefficients, num_parameters = 38)
       interactions_agpp_climate_change[[i]] = interaction_matrix_agpp_climate_change
 
-      fit_rf <- ranger(overall_agpp_climate_change ~ . , data = as.data.frame(data_agpp_climate_change), importance = 'impurity')
+      fit_rf <- ranger(overall_agpp_climate_change ~ . , data = as.data.frame(data_agpp_climate_change), importance = 'impurity',num.threads = 10)
       effects_agpp_climate_change_rf[i,1:ncol(parameters)] = fit_rf$variable.importance
       effects_agpp_climate_change_rf[i,ncol(effects_agpp_climate_change)] = results[['agpp']][['climate_change']][2,1]
       ### steady climate ###
@@ -375,7 +265,7 @@ get_main_effects <- function(sites, parameternames, species){
       interaction_matrix_agpp_steady_climate = get_interaction_matrix(coefficients, num_parameters = 38)
       interactions_agpp_steady_climate[[i]] = interaction_matrix_agpp_steady_climate
 
-      fit_rf <- ranger(overall_agpp_steady_climate ~ . , data = as.data.frame(data_agpp_steady_climate), importance = 'impurity')
+      fit_rf <- ranger(overall_agpp_steady_climate ~ . , data = as.data.frame(data_agpp_steady_climate), importance = 'impurity',num.threads = 10)
       effects_agpp_steady_climate_rf[i,1:ncol(parameters)] = fit_rf$variable.importance
       effects_agpp_steady_climate_rf[i,ncol(effects_agpp_steady_climate)] = results[['agpp']][['complete']][2,1]
 
@@ -385,16 +275,7 @@ get_main_effects <- function(sites, parameternames, species){
   }
 
 
-  result_list = list("anpp" = list("steady_climate" = effects_anpp_steady_climate,
-                                                "climate_change" = effects_anpp_climate_change,
-                                                "complete" = effects_anpp_complete),
-                     "anpp_rf" = list("steady_climate" = effects_anpp_steady_climate_rf,
-                                   "climate_change" = effects_anpp_climate_change_rf,
-                                   "complete" = effects_anpp_complete_rf),
-
-                     "anpp_interactions" = list("steady_climate" = interactions_anpp_steady_climate,
-                                                "climate_change" = interactions_anpp_climate_change,
-                                                "complete" = interactions_anpp_complete),
+  result_list = list(
                                   "agpp" = list("steady_climate" = effects_agpp_steady_climate,
                                                 "climate_change" = effects_agpp_climate_change,
                                                 "complete" = effects_agpp_complete),
@@ -404,15 +285,6 @@ get_main_effects <- function(sites, parameternames, species){
                      "agpp_interactions" = list("steady_climate" = interactions_agpp_steady_climate,
                                                 "climate_change" = interactions_agpp_climate_change,
                                                 "complete" = interactions_agpp_complete),
-                                  "cmass" = list("steady_climate" = effects_cmass_steady_climate,
-                                                 "climate_change" = effects_cmass_climate_change,
-                                                 "complete" = effects_cmass_complete),
-                     "cmass_rf" = list("steady_climate" = effects_cmass_steady_climate_rf,
-                                      "climate_change" = effects_cmass_climate_change_rf,
-                                      "complete" = effects_cmass_complete_rf),
-                     "cmass_interactions" = list("steady_climate" = interactions_cmass_steady_climate,
-                                                "climate_change" = interactions_cmass_climate_change,
-                                                "complete" = interactions_cmass_complete),
                                   "cpool" = list("steady_climate" = effects_cpool_steady_climate,
                                                  "climate_change" = effects_cpool_climate_change,
                                                  "complete" = effects_cpool_complete),
@@ -446,14 +318,14 @@ parameters_pin_syl = c(as.character(parameters$Pin_syl$NameRLPJ), drivernames)
 
 effect_list_Pic_abi <- get_main_effects(sites = sites, parameternames = parameters_pic_abi, species = "Lin_Pic_abi")
 
-saveRDS(effect_list_Pic_abi, file = "LPJrunTest/Results/Pic_abi_effects_lin.rds")
+saveRDS(effect_list_Pic_abi, file = "LPJrunTest/Results/Pic_abi_effects_lin2.rds")
 
 effect_list_Pin_syl <- get_main_effects(sites = sites, parameternames = parameters_pin_syl, species = "Lin_Pin_syl")
 
-saveRDS(effect_list_Pin_syl, "LPJrunTest/Results/Pin_syl_effects_lin.rds")
+saveRDS(effect_list_Pin_syl, "LPJrunTest/Results/Pin_syl_effects_lin2.rds")
 
 effect_list_Fag_syl <- get_main_effects(sites = sites, parameternames = parameters_fag_syl, species = "Lin_Fag_syl")
 
-saveRDS(effect_list_Fag_syl, "LPJrunTest/Results/Fag_syl_effects_lin.rds")
+saveRDS(effect_list_Fag_syl, "LPJrunTest/Results/Fag_syl_effects_lin2.rds")
 
 

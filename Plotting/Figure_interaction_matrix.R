@@ -25,11 +25,11 @@ parameternames_ordered_pin_syl = names(results$parameters[[1]][which(names(resul
 
 ### Loading the results of the linear regressions ###
 
-effects_Pic_abi = readRDS("LPJrunTest/Results/Pic_abi_effects_lin.rds")
+effects_Pic_abi = readRDS("LPJrunTest/Results/Pic_abi_effects_lin2.rds")
 
-effects_Fag_syl = readRDS("LPJrunTest/Results/Fag_syl_effects_lin.rds")
+effects_Fag_syl = readRDS("LPJrunTest/Results/Fag_syl_effects_lin2.rds")
 
-effects_Pin_syl = readRDS("LPJrunTest/Results/Pin_syl_effects_lin.rds")
+effects_Pin_syl = readRDS("LPJrunTest/Results/Pin_syl_effects_lin2.rds")
 
 
 #### Analysis for Pic abi ####
@@ -144,19 +144,6 @@ interaction_matrix_Pic_abi_agpp_rel = interaction_matrix_Pic_abi_agpp_rel/max(ab
 interaction_matrix_Pic_abi_cflux_rel = interaction_matrix_Pic_abi_cflux_rel/max(abs(interaction_matrix_Pic_abi_cflux_rel), na.rm =T)
 interaction_matrix_Pic_abi_cpool_rel = interaction_matrix_Pic_abi_cpool_rel/max(abs(interaction_matrix_Pic_abi_cpool_rel), na.rm =T)
 
-#
-# interaction_matrix_Pin_syl_agpp_abs = interaction_matrix_Pin_syl_agpp_abs[ordering_pin_syl,ordering_pin_syl]/max(abs(interaction_matrix_Pin_syl_agpp_abs), na.rm =T)
-# interaction_matrix_Pin_syl_cflux_abs = interaction_matrix_Pin_syl_cflux_abs[ordering_pin_syl,ordering_pin_syl]/max(abs(interaction_matrix_Pin_syl_cflux_abs), na.rm =T)
-# interaction_matrix_Pin_syl_cpool_abs = interaction_matrix_Pin_syl_cpool_abs[ordering_pin_syl,ordering_pin_syl]/max(abs(interaction_matrix_Pin_syl_cpool_abs), na.rm =T)
-#
-# interaction_matrix_Fag_syl_agpp_abs = interaction_matrix_Fag_syl_agpp_abs[ordering_fag_syl,ordering_fag_syl]/max(abs(interaction_matrix_Fag_syl_agpp_abs), na.rm =T)
-# interaction_matrix_Fag_syl_cflux_abs = interaction_matrix_Fag_syl_cflux_abs[ordering_fag_syl,ordering_fag_syl]/max(abs(interaction_matrix_Fag_syl_cflux_abs), na.rm =T)
-# interaction_matrix_Fag_syl_cpool_abs = interaction_matrix_Fag_syl_cpool_abs[ordering_fag_syl,ordering_fag_syl]/max(abs(interaction_matrix_Fag_syl_cpool_abs), na.rm =T)
-#
-#
-# interaction_matrix_Pic_abi_agpp_abs = interaction_matrix_Pic_abi_agpp_abs/max(abs(interaction_matrix_Pic_abi_agpp_abs), na.rm =T)
-# interaction_matrix_Pic_abi_cflux_abs = interaction_matrix_Pic_abi_cflux_abs/max(abs(interaction_matrix_Pic_abi_cflux_abs), na.rm =T)
-# interaction_matrix_Pic_abi_cpool_abs = interaction_matrix_Pic_abi_cpool_abs/max(abs(interaction_matrix_Pic_abi_cpool_abs), na.rm =T)
 
 parameters = readRDS("./ParameterMetaData/Parameter_list.rds")
 drivers = c("co2","ndep","insol","temp","ph","prec")
@@ -191,19 +178,6 @@ interaction_matrix_cpool_rel = (interaction_matrix_Fag_syl_cpool_rel + interacti
 
 
 
-# interaction_matrix_agpp_abs = (interaction_matrix_Fag_syl_agpp_abs + interaction_matrix_Pic_abi_agpp_abs +
-#                                  interaction_matrix_Pin_syl_agpp_abs)/3
-#
-#
-#
-# interaction_matrix_cflux_abs = (interaction_matrix_Fag_syl_cflux_abs + interaction_matrix_Pic_abi_cflux_abs +
-#                                   interaction_matrix_Pin_syl_cflux_abs)/3
-#
-#
-#
-# interaction_matrix_cpool_abs = (interaction_matrix_Fag_syl_cpool_abs + interaction_matrix_Pic_abi_cpool_abs +
-#                                   interaction_matrix_Pin_syl_cpool_abs)/3
-#
 
 
 
@@ -220,17 +194,7 @@ interaction_matrix_cflux_rel = interaction_matrix_cflux_rel[order(grouping2),ord
 rowsums_cflux_rel = apply(abs(interaction_matrix_cflux_rel), 2,sum, na.rm = T)
 interaction_matrix_cflux_rel[upper.tri(interaction_matrix_cflux_rel)] <- NA
 
-# interaction_matrix_agpp_abs = interaction_matrix_agpp_abs[order(grouping2),order(grouping2)]
-# rowsums_agpp_abs = apply(abs(interaction_matrix_agpp_abs), 2,sum, na.rm = T)
-# interaction_matrix_agpp_abs[upper.tri(interaction_matrix_agpp_abs)] <- NA
-#
-# interaction_matrix_cpool_abs = interaction_matrix_cpool_abs[order(grouping2),order(grouping2)]
-# rowsums_cpool_abs = apply(abs(interaction_matrix_cpool_abs), 2,sum, na.rm = T)
-# interaction_matrix_cpool_abs[upper.tri(interaction_matrix_cpool_abs)] <- NA
-#
-# interaction_matrix_cflux_abs = interaction_matrix_cflux_abs[order(grouping2),order(grouping2)]
-# rowsums_cflux_abs = apply(abs(interaction_matrix_cflux_abs), 2,sum, na.rm = T)
-# interaction_matrix_cflux_abs[upper.tri(interaction_matrix_cflux_abs)] <- NA
+
 
 
 rownames(interaction_matrix_agpp_rel) = parameternames_ordered_pic_abi2[order(grouping2)]
@@ -240,22 +204,14 @@ colnames(interaction_matrix_cpool_rel) = parameternames_ordered_pic_abi2[order(g
 rownames(interaction_matrix_cflux_rel) = parameternames_ordered_pic_abi2[order(grouping2)]
 colnames(interaction_matrix_cflux_rel) = parameternames_ordered_pic_abi2[order(grouping2)]
 
-# rownames(interaction_matrix_agpp_abs) = parameternames_ordered_pic_abi2[order(grouping2)]
-# colnames(interaction_matrix_agpp_abs) = parameternames_ordered_pic_abi2[order(grouping2)]
-# rownames(interaction_matrix_cpool_abs) = parameternames_ordered_pic_abi2[order(grouping2)]
-# colnames(interaction_matrix_cpool_abs) = parameternames_ordered_pic_abi2[order(grouping2)]
-# rownames(interaction_matrix_cflux_abs) = parameternames_ordered_pic_abi2[order(grouping2)]
-# colnames(interaction_matrix_cflux_abs) = parameternames_ordered_pic_abi2[order(grouping2)]
+
 
 
 grouping2 = data.frame(grouping2[order(grouping2),])
 rownames(grouping2) = rownames(interaction_matrix_agpp_rel)
 colnames(grouping2) = "Processes"
 
-# rowsums_agpp_abs = rowsums_agpp_abs[order(grouping2)]
-# rowsums_cflux_abs = rowsums_cflux_abs[order(grouping2)]
-# rowsums_cpool_abs = rowsums_cpool_abs[order(grouping2)]
-#
+
 
 library(pheatmap)
 library(RColorBrewer)
