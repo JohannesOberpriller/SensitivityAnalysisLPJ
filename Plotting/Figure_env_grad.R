@@ -65,7 +65,7 @@ for(i in 1:length(noisy_things)){
   variablenames2 = gsub(noisy_things[i],"",variablenames2)
 }
 
-grouping = read.csv(".ParameterMetaData/Grouping_Fag_syl.csv", header = T, sep = ";")
+grouping = read.csv("ParameterMetaData/Grouping_Fag_syl.csv", header = T, sep = ";")
 grouping = c(as.character(grouping[,1]), rep("Drivers",6))
 
 order_grouping = match(parameternames_ordered_pic_abi2, variablenames2)
@@ -193,14 +193,16 @@ average_effects_cpool =   (aggregated_effects_Fag_syl_cpool_scaled +
 average_effects_cpool <- cbind(average_effects_cpool, sites[["Temperature [C°]"]])
 colnames(average_effects_cpool) = c(colnames(aggregated_effects_Pic_abi_cpool_scaled), "Temperature")
 
-df_effects_cpool_temp = matrix(ncol = 4, nrow = 7)
-colnames(df_effects_cpool_temp) = c("minimum","maximum","mean","effectsize")
+df_effects_cpool_temp = matrix(ncol = 6, nrow = 7)
+colnames(df_effects_cpool_temp) = c("minimum","maximum","mean","effectsize","p-value", "R^2")
 for(i in 1:7){
   df_effects_cpool_temp[i,1] = min(average_effects_cpool[,i], na.rm = T)
   df_effects_cpool_temp[i,2] = max(average_effects_cpool[,i],na.rm = T)
   df_effects_cpool_temp[i,3] = mean(average_effects_cpool[,i],na.rm = T)
-  df_effects_cpool_temp_lm = lm(average_effects_cpool[,i] ~average_effects_cpool[,8],na.action = na.omit)
+  df_effects_cpool_temp_lm = lm(average_effects_cpool[,i] ~ average_effects_cpool[,8],na.action = na.omit)
   df_effects_cpool_temp[i,4] = coef(df_effects_cpool_temp_lm)[2]
+  df_effects_cpool_temp[i,5] = summary(df_effects_cpool_temp_lm)$coefficients[2,4]
+  df_effects_cpool_temp[i,6] = summary(df_effects_cpool_temp_lm)$r.squared
 }
 rownames(df_effects_cpool_temp)= colnames(average_effects_cpool)[1:7]
 
@@ -317,14 +319,16 @@ average_effects_cpool =   (aggregated_effects_Fag_syl_cpool_scaled +
 average_effects_cpool <- cbind(average_effects_cpool, sites[["Temperature [C°]"]])
 colnames(average_effects_cpool) = c(colnames(aggregated_effects_Pic_abi_cpool_scaled), "Temperature")
 
-df_effects_cpool_temp = matrix(ncol = 4, nrow = 6)
-colnames(df_effects_cpool_temp) = c("minimum","maximum","mean","effectsize")
+df_effects_cpool_temp = matrix(ncol = 6, nrow = 6)
+colnames(df_effects_cpool_temp) = c("minimum","maximum","mean","effectsize","p-value", "R^2")
 for(i in 1:6){
   df_effects_cpool_temp[i,1] = min(average_effects_cpool[,i], na.rm = T)
   df_effects_cpool_temp[i,2] = max(average_effects_cpool[,i],na.rm = T)
   df_effects_cpool_temp[i,3] = mean(average_effects_cpool[,i],na.rm = T)
-  df_effects_cpool_temp_lm = lm(average_effects_cpool[,i] ~average_effects_cpool[,7],na.action = na.omit)
+  df_effects_cpool_temp_lm = lm(average_effects_cpool[,i] ~ average_effects_cpool[,7],na.action = na.omit)
   df_effects_cpool_temp[i,4] = coef(df_effects_cpool_temp_lm)[2]
+  df_effects_cpool_temp[i,5] = summary(df_effects_cpool_temp_lm)$coefficients[2,4]
+  df_effects_cpool_temp[i,6] = summary(df_effects_cpool_temp_lm)$r.squared
 }
 rownames(df_effects_cpool_temp)= colnames(average_effects_cpool)[1:6]
 

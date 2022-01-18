@@ -4,7 +4,7 @@ rescaling <- function(x) {(x-min(x))/(max(x)-min(x))-0.5}
 # function to rescale effects from 0 to 1
 rescaling_abs <- function(x) {abs(x)/max(abs(x))}
 
-
+parametermixed = readRDS("ParameterMetaData/Parameter_mixed.rds")
 
 ## getting the ordered parameter names ##
 
@@ -21,11 +21,6 @@ parameters_pic_abi = c(as.character(parameters$Pic_abi$NameRLPJ))
 parameters_fag_syl = c(as.character(parameters$Fag_syl$NameRLPJ))
 parameters_pin_syl = c(as.character(parameters$Pin_syl$NameRLPJ))
 
-#
-#
-#
-# ordering_param_only_fag_syl = match(gsub("Pic_abi","",parameters$Pic_abi$NameRLPJ), gsub("Fag_syl","",parameters$Fag_syl$NameRLPJ))
-# ordering_param_only_pin_syl = match(gsub("Pic_abi","",parameters$Pic_abi$NameRLPJ), gsub("Pin_syl","",parameters$Pin_syl$NameRLPJ))
 
 # loading the results to get the names in the prespecified order
 
@@ -581,6 +576,13 @@ mean_sensi_abs = data.frame("Group" = grouping2,
                               "agpp_mixed" = main_sensi_mixed_agpp[order_mixed],
                               "Names" = names_ordered)
 
+uncert_order = readRDS("ParameterMetaData/uncert_ordering.rds")
+
+mean_sensi_abs = mean_sensi_abs[match(uncert_order,mean_sensi_abs$Names),]
+
+mean_sensi_abs = mean_sensi_abs[order(mean_sensi_abs$Group),]
+mean_sensi_abs = mean_sensi_abs[-which(mean_sensi_abs$Names == "ph"),]
+
 mean_sensi_drivers = mean_sensi_abs[mean_sensi_abs$Group == "Drivers",]
 
 mean_sensi_parameters = mean_sensi_abs[mean_sensi_abs$Group != "Drivers",]
@@ -628,188 +630,169 @@ for(i in 1:6){
   colors_full = c(colors_full,rep(colors_parameter[i],spaces[i]))
 }
 
-pdf("./Figures/Mean_sensi.pdf", width = 18.0, height = 12)
+pdf("./Figures/Mean_sensi.pdf", width = 14.0, height = 10)
 
 
 layout(matrix(c(1,2,3,4),byrow =T,nrow =4), heights = c(2,2,2,1))
 old_mar = c(5.1,4.1,4.1,2.1)
 par(mar = c(0.6,4.1,9.1,12.1))
-plot(y = rep(0,39),x=1:39,
+plot(y = rep(0,38),x=1:38,
      ylab = "", xlab = "", xaxt = "n",
-     col = c(rep("white",39)),xaxt='n', bty="n", yaxt = 'n',
-     ylim = c(min(c(mean_sensi_abs$cpool_fag_syl,mean_sensi_abs$cpool_pic_abi,mean_sensi_abs$cpool_pin_syl,
-                    mean_sensi_abs$cpool_mixed))*1.1,max(c(mean_sensi_abs$cpool_fag_syl,mean_sensi_abs$cpool_pic_abi,mean_sensi_abs$cpool_pin_syl,
-                                                           mean_sensi_abs$cpool_mixed))*1.1), cex.main = 1.5)
+     col = c(rep("white",38)),xaxt='n', bty="n", yaxt = 'n',
+     ylim = c(-1,1), cex.main = 1.5)
 mtext("Percentual sensitivities [%]", side =2, cex =1.2, line = 2.5)
 barplot(height = apply(rbind(mean_sensi_parameters$cpool_fag_syl,mean_sensi_parameters$cpool_pic_abi,mean_sensi_parameters$cpool_pin_syl,
                              mean_sensi_parameters$cpool_mixed),2,mean),
         col = as.vector(sapply(FUN = t_col, X= colors_full, percent = 65)), add = T,axes = F,
         width = 0.85, space = c(0.5/0.85,rep(0.15/0.85,31)), pos = rep(1,32))
 points(y = mean_sensi_parameters$cpool_fag_syl , x= 1:32, pch = 15, col = "darkgreen",
-       cex = 1.2)
+       cex = 1.3)
 points(y = mean_sensi_parameters$cpool_pic_abi,
-       x = 1:nrow(mean_sensi_parameters), col = "darkblue", pch = 19,cex = 1.2)
+       x = 1:nrow(mean_sensi_parameters), col = "darkblue", pch = 19,cex = 1.3)
 points(y = mean_sensi_parameters$cpool_pin_syl,
        x = 1:nrow(mean_sensi_parameters), col = "brown", pch = 17,
-       cex = 1.2)
+       cex = 1.3)
 points(y = mean_sensi_parameters$cpool_mixed, col = "purple",pch =8,
-       cex = 1.2,x = 1:nrow(mean_sensi_parameters))
+       cex = 1.3,x = 1:nrow(mean_sensi_parameters))
 points(y = apply(rbind(mean_sensi_parameters$cpool_fag_syl,mean_sensi_parameters$cpool_pic_abi,mean_sensi_parameters$cpool_pin_syl),2,mean),
        x = 1:nrow(mean_sensi_parameters), col = "black", pch = "-", cex=3)
 
-axis(1, at = 1:39, labels = rep("",39),srt = 45, las =2 , pos = 0)
-axis(2, at = round(seq(min(c(mean_sensi_abs$cpool_fag_syl,mean_sensi_abs$cpool_pic_abi,mean_sensi_abs$cpool_pin_syl,
-                             mean_sensi_abs$cpool_mixed))*1.1,max(c(mean_sensi_abs$cpool_fag_syl,mean_sensi_abs$cpool_pic_abi,mean_sensi_abs$cpool_pin_syl,
-                               mean_sensi_abs$cpool_mixed))*1.1,length.out = 5),1), las = 2, line = -0.5, cex.axis = 1.5)
+axis(1, at = 1:38, labels = rep("",38),srt = 45, las =2 , pos = 0)
+axis(2, at = round(seq(-1,1,length.out = 5),1), las = 2, line = -0.5, cex.axis = 1.5)
 barplot(height = apply(rbind(mean_sensi_drivers$cpool_fag_syl,mean_sensi_drivers$cpool_pic_abi,mean_sensi_drivers$cpool_pin_syl,
                              mean_sensi_drivers$cpool_mixed),2,mean),
         col = as.vector(sapply(FUN = t_col, X= rep("gold2",6), percent = 65)),
-        add = T,axes = F, width = 0.85, space = c(33.5/0.85,rep(0.15/0.85,5)))
-points(y =mean_sensi_drivers$cpool_fag_syl, x = 34:39,col = "darkgreen",xaxt='n', bty="n", yaxt = 'n', pch = 15,
-       ylim = c(0,.15),cex = 1.2)
+        add = T,axes = F, width = 0.85, space = c(33.5/0.85,rep(0.15/0.85,4)))
+points(y =mean_sensi_drivers$cpool_fag_syl, x = 34:38,col = "darkgreen",xaxt='n', bty="n", yaxt = 'n', pch = 15,
+       ylim = c(0,.15),cex = 1.3)
 ablineclip(v = cumsum(table(mean_sensi_parameters$Group))+0.5, col = alpha("black",0.7),
-           y1 = min(c(mean_sensi_abs$cpool_fag_syl,mean_sensi_abs$cpool_pic_abi,mean_sensi_abs$cpool_pin_syl,
-                      mean_sensi_abs$cpool_mixed))*1.1)
+           y1 = -1)
 points(y = mean_sensi_drivers$cpool_pic_abi,
-       x = 34:39, col = "darkblue", pch = 19,cex = 1.2)
+       x = 34:38, col = "darkblue", pch = 19,cex = 1.3)
 points(y = mean_sensi_drivers$cpool_pin_syl,
-       x = 34:39, col = "brown", pch = 17,
-       cex = 1.2)
+       x = 34:38, col = "brown", pch = 17,
+       cex = 1.3)
 points(y = mean_sensi_drivers$cpool_mixed, col = "purple",pch = 8,
-       cex = 1.2,x = 34:39)
+       cex = 1.3,x = 34:38)
 points(y = apply(rbind(mean_sensi_drivers$cpool_fag_syl,mean_sensi_drivers$cpool_pic_abi,mean_sensi_drivers$cpool_pin_syl),2,mean),
-       x = 34:39, col = "black", pch = "-", cex=3)
+       x = 34:38, col = "black", pch = "-", cex=3)
 ablineclip(v = 33,col = alpha("black",0.7),y1 = min(c(mean_sensi_abs$cpool_fag_syl,mean_sensi_abs$cpool_pic_abi,mean_sensi_abs$cpool_pin_syl,
                                                       mean_sensi_abs$cpool_mixed))*1.1)
 spacings = (cumsum(table(mean_sensi_parameters$Group)) + c(0,cumsum(table(mean_sensi_parameters$Group))[-length(cumsum(table(mean_sensi_parameters$Group)))]))/2 +0.5
 grouping_variables = names(table(mean_sensi_parameters$Group))
 par(xpd =  T)
 text(c(names(table(mean_sensi_parameters$Group))[which(names(table(mean_sensi_parameters$Group)) != "Drivers")],"Drivers"),
-     x = c(spacings,36) ,  y = max(c(mean_sensi_abs$cpool_fag_syl,mean_sensi_abs$cpool_pic_abi,mean_sensi_abs$cpool_pin_syl,
-                                                          mean_sensi_abs$cpool_mixed))*1.2, font = 2, cex =1.8, srt = 30, pos = 4, offset =  c(0,20))
+     x = c(spacings,36) ,  y = 1.1, font = 2, cex =1.8, srt = 30, pos = 4, offset =  c(0,20))
 par(xpd = F)
-ablineclip(h = max(c(mean_sensi_abs$cpool_fag_syl,mean_sensi_abs$cpool_pic_abi,mean_sensi_abs$cpool_pin_syl,
-                     mean_sensi_abs$cpool_mixed))*1.1, x1 =0, x2 = 40.5)
-ablineclip(v = c(39.5), y1=min(c(mean_sensi_abs$cpool_fag_syl,mean_sensi_abs$cpool_pic_abi,mean_sensi_abs$cpool_pin_syl,
-                                 mean_sensi_abs$cpool_mixed))*1.1)
+ablineclip(h = 1, x1 =0, x2 = 39.5)
+ablineclip(v = c(38.5), y1 = -1,y2= 1)
 title(main = "a)", line = 6, adj = 0.01, cex.main = 2)
 
 par(mar = c(0.6,4.1,5.6,12.1))
-plot(y = rep(0,39),x=1:39,
+plot(y = rep(0,38),x=1:38,
      ylab = "", xlab = "", xaxt = "n",
-     col = c(rep("white",39)),xaxt='n', bty="n", yaxt = 'n',
-     ylim = c(min(c(mean_sensi_abs$cflux_fag_syl,mean_sensi_abs$cflux_pic_abi,mean_sensi_abs$cflux_pin_syl,
-                    mean_sensi_abs$cflux_mixed))*1.1,max(c(mean_sensi_abs$cflux_fag_syl,mean_sensi_abs$cflux_pic_abi,mean_sensi_abs$cflux_pin_syl,
-                                                           mean_sensi_abs$cflux_mixed))*1.1))
+     col = c(rep("white",38)),xaxt='n', bty="n", yaxt = 'n',
+     ylim = c(-1,1))
 mtext("Percentual sensitivities [%]", side =2, cex =1.2, line = 2.5)
 barplot(height = apply(rbind(mean_sensi_parameters$cflux_fag_syl,mean_sensi_parameters$cflux_pic_abi,mean_sensi_parameters$cflux_pin_syl,
                              mean_sensi_parameters$cflux_mixed),2,mean),
         col = as.vector(sapply(FUN = t_col, X= colors_full, percent = 65)), add = T,axes = F,
         width = 0.85, space = c(0.5/0.85,rep(0.15/0.85,31)), pos = rep(1,32))
 points(y = mean_sensi_parameters$cflux_fag_syl , x= 1:32, pch = 15, col = "darkgreen",
-       cex = 1.2)
+       cex = 1.3)
 points(y = mean_sensi_parameters$cflux_pic_abi,
-       x = 1:nrow(mean_sensi_parameters), col = "darkblue", pch = 19,cex = 1.2)
+       x = 1:nrow(mean_sensi_parameters), col = "darkblue", pch = 19,cex = 1.3)
 points(y = mean_sensi_parameters$cflux_pin_syl,
        x = 1:nrow(mean_sensi_parameters), col = "brown", pch = 17,
-       cex = 1.2)
+       cex = 1.3)
 points(y = mean_sensi_parameters$cflux_mixed, col = "purple",pch =8,
-       cex = 1.2,x = 1:nrow(mean_sensi_parameters))
+       cex = 1.3,x = 1:nrow(mean_sensi_parameters))
 points(y = apply(rbind(mean_sensi_parameters$cflux_fag_syl,mean_sensi_parameters$cflux_pic_abi,mean_sensi_parameters$cflux_pin_syl),2,mean),
        x = 1:nrow(mean_sensi_parameters), col = "black", pch = "-", cex=3)
 
-axis(1, at = 1:39, labels = rep("",39),srt = 45, las =2 , pos = 0)
-axis(2, at = round(seq(min(c(mean_sensi_abs$cflux_fag_syl,mean_sensi_abs$cflux_pic_abi,mean_sensi_abs$cflux_pin_syl,
-                             mean_sensi_abs$cflux_mixed))*1.1,max(c(mean_sensi_abs$cflux_fag_syl,mean_sensi_abs$cflux_pic_abi,mean_sensi_abs$cflux_pin_syl,
-                                                                    mean_sensi_abs$cflux_mixed))*1.1,length.out = 5),1), las = 2, line = -0.5, cex.axis = 1.5)
+axis(1, at = 1:38, labels = rep("",38),srt = 45, las =2 , pos = 0)
+axis(2, at = round(seq(-1,1,length.out = 5),1), las = 2, line = -0.5, cex.axis = 1.5)
 barplot(height = apply(rbind(mean_sensi_drivers$cflux_fag_syl,mean_sensi_drivers$cflux_pic_abi,mean_sensi_drivers$cflux_pin_syl,
                              mean_sensi_drivers$cflux_mixed),2,mean),
         col = as.vector(sapply(FUN = t_col, X= rep("gold2",6), percent = 65)),
-        add = T,axes = F, width = 0.85, space = c(33.5/0.85,rep(0.15/0.85,5)))
-points(y =mean_sensi_drivers$cflux_fag_syl, x = 34:39,col = "darkgreen",xaxt='n', bty="n", yaxt = 'n', pch = 15,
-       ylim = c(0,.15),cex = 1.2)
+        add = T,axes = F, width = 0.85, space = c(33.5/0.85,rep(0.15/0.85,4)))
+points(y =mean_sensi_drivers$cflux_fag_syl, x = 34:38,col = "darkgreen",xaxt='n', bty="n", yaxt = 'n', pch = 15,
+       ylim = c(0,.15),cex = 1.3)
 ablineclip(v = cumsum(table(mean_sensi_parameters$Group))+0.5, col = alpha("black",0.7),
-           y1 = min(c(mean_sensi_abs$cflux_fag_syl,mean_sensi_abs$cflux_pic_abi,mean_sensi_abs$cflux_pin_syl,
-                      mean_sensi_abs$cflux_mixed))*1.1)
+           y1 = -1)
 points(y = mean_sensi_drivers$cflux_pic_abi,
-       x = 34:39, col = "darkblue", pch = 19,cex = 1.2)
+       x = 34:38, col = "darkblue", pch = 19,cex = 1.3)
 points(y = mean_sensi_drivers$cflux_pin_syl,
-       x = 34:39, col = "brown", pch = 17,
-       cex = 1.2)
+       x = 34:38, col = "brown", pch = 17,
+       cex = 1.3)
 points(y = mean_sensi_drivers$cflux_mixed, col = "purple",pch = 8,
-       cex = 1.2,x = 34:39)
+       cex = 1.3,x = 34:38)
 points(y = apply(rbind(mean_sensi_drivers$cflux_fag_syl,mean_sensi_drivers$cflux_pic_abi,mean_sensi_drivers$cflux_pin_syl),2,mean),
-       x = 34:39, col = "black", pch = "-", cex=3)
-ablineclip(v = 33,col = alpha("black",0.7),y1 = min(c(mean_sensi_abs$cflux_fag_syl,mean_sensi_abs$cflux_pic_abi,mean_sensi_abs$cflux_pin_syl,
-                                                      mean_sensi_abs$cflux_mixed))*1.1)
+       x = 34:38, col = "black", pch = "-", cex=3)
+ablineclip(v = 33,col = alpha("black",0.7),y1 = -1)
 par(xpd =T)
-legend(x = 40, y = 0.6,
+legend(x = 39, y = 0.6,
        legend = c("Fag. syl.","Pic. abi.",'Pin. syl.',"Mixed",'Mean Mono'),
        col = c('darkgreen', 'darkblue','brown', "purple",'black'), bty = 'n',
        title = as.expression(bquote(italic(bold("Species")))),
        pch = c(15,19,17,8,NA), cex = 1.8, lty = c(NA,NA,NA,NA,1),
        lwd = 2)
 par(xpd = F)
-ablineclip(h = 220, x1 =0, x2 = 33.5)
+ablineclip(v = c(38.5), y1 = -1,y2= 1)
 title(main = "b)", line = 2, adj = 0.01, cex.main = 2)
 
 par(mar = c(1.1,4.1,6.1,12.1))
-plot(y = rep(0,39),x=1:39,
+plot(y = rep(0,38),x=1:38,
      ylab = "", xlab = "", xaxt = "n",
-     col = c(rep("white",39)),xaxt='n', bty="n", yaxt = 'n',
-     ylim = c(min(c(mean_sensi_abs$agpp_fag_syl,mean_sensi_abs$agpp_pic_abi,mean_sensi_abs$agpp_pin_syl,
-                    mean_sensi_abs$agpp_mixed))*1.1,max(c(mean_sensi_abs$agpp_fag_syl,mean_sensi_abs$agpp_pic_abi,mean_sensi_abs$agpp_pin_syl,
-                                                           mean_sensi_abs$agpp_mixed))*1.1))
+     col = c(rep("white",38)),xaxt='n', bty="n", yaxt = 'n',
+     ylim = c(-1,1))
 mtext("Percentual sensitivities [%]", side =2, cex =1.2, line = 2.5)
 barplot(height = apply(rbind(mean_sensi_parameters$agpp_fag_syl,mean_sensi_parameters$agpp_pic_abi,mean_sensi_parameters$agpp_pin_syl,
                              mean_sensi_parameters$agpp_mixed),2,mean),
         col = as.vector(sapply(FUN = t_col, X= colors_full, percent = 65)), add = T,axes = F,
         width = 0.85, space = c(0.5/0.85,rep(0.15/0.85,31)), pos = rep(1,32))
 points(y = mean_sensi_parameters$agpp_fag_syl , x= 1:32, pch = 15, col = "darkgreen",
-       cex = 1.2)
+       cex = 1.3)
 points(y = mean_sensi_parameters$agpp_pic_abi,
-       x = 1:nrow(mean_sensi_parameters), col = "darkblue", pch = 19,cex = 1.2)
+       x = 1:nrow(mean_sensi_parameters), col = "darkblue", pch = 19,cex = 1.3)
 points(y = mean_sensi_parameters$agpp_pin_syl,
        x = 1:nrow(mean_sensi_parameters), col = "brown", pch = 17,
-       cex = 1.2)
+       cex = 1.3)
 points(y = mean_sensi_parameters$agpp_mixed, col = "purple",pch =8,
-       cex = 1.2,x = 1:nrow(mean_sensi_parameters))
+       cex = 1.3,x = 1:nrow(mean_sensi_parameters))
 points(y = apply(rbind(mean_sensi_parameters$agpp_fag_syl,mean_sensi_parameters$agpp_pic_abi,mean_sensi_parameters$agpp_pin_syl),2,mean),
        x = 1:nrow(mean_sensi_parameters), col = "black", pch = "-", cex=3)
 
-axis(1, at = 1:39, labels = rep("",39),srt = 45, las =2 , pos = 0)
-axis(2, at = round(seq(min(c(mean_sensi_abs$agpp_fag_syl,mean_sensi_abs$agpp_pic_abi,mean_sensi_abs$agpp_pin_syl,
-                             mean_sensi_abs$agpp_mixed))*1.1,max(c(mean_sensi_abs$agpp_fag_syl,mean_sensi_abs$agpp_pic_abi,mean_sensi_abs$agpp_pin_syl,
-                                                                    mean_sensi_abs$agpp_mixed))*1.1,length.out = 5),1), las = 2, line = -0.5, cex.axis =1.5)
+axis(1, at = 1:38, labels = rep("",38),srt = 45, las =2 , pos = 0)
+axis(2, at = round(seq(-1,1,length.out = 5),1), las = 2, line = -0.5, cex.axis = 1.5)
 barplot(height = apply(rbind(mean_sensi_drivers$agpp_fag_syl,mean_sensi_drivers$agpp_pic_abi,mean_sensi_drivers$agpp_pin_syl,
                              mean_sensi_drivers$agpp_mixed),2,mean),
         col = as.vector(sapply(FUN = t_col, X= rep("gold2",6), percent = 65)),
-        add = T,axes = F, width = 0.85, space = c(33.5/0.85,rep(0.15/0.85,5)))
-points(y =mean_sensi_drivers$agpp_fag_syl, x = 34:39,col = "darkgreen",xaxt='n', bty="n", yaxt = 'n', pch = 15,
-       ylim = c(0,.15),cex = 1.2)
+        add = T,axes = F, width = 0.85, space = c(33.5/0.85,rep(0.15/0.85,4)))
+points(y =mean_sensi_drivers$agpp_fag_syl, x = 34:38,col = "darkgreen",xaxt='n', bty="n", yaxt = 'n', pch = 15,
+       ylim = c(0,.15),cex = 1.3)
 ablineclip(v = cumsum(table(mean_sensi_parameters$Group))+0.5, col = alpha("black",0.7),
-           y1 = min(c(mean_sensi_abs$agpp_fag_syl,mean_sensi_abs$agpp_pic_abi,mean_sensi_abs$agpp_pin_syl,
-                      mean_sensi_abs$agpp_mixed))*1.1)
+           y1 = -1)
 points(y = mean_sensi_drivers$agpp_pic_abi,
-       x = 34:39, col = "darkblue", pch = 19,cex = 1.2)
+       x = 34:38, col = "darkblue", pch = 19,cex = 1.3)
 points(y = mean_sensi_drivers$agpp_pin_syl,
-       x = 34:39, col = "brown", pch = 17,
-       cex = 1.2)
+       x = 34:38, col = "brown", pch = 17,
+       cex = 1.3)
 points(y = mean_sensi_drivers$agpp_mixed, col = "purple",pch = 8,
-       cex = 1.2,x = 34:39)
+       cex = 1.3,x = 34:38)
 points(y = apply(rbind(mean_sensi_drivers$agpp_fag_syl,mean_sensi_drivers$agpp_pic_abi,mean_sensi_drivers$agpp_pin_syl),2,mean),
-       x = 34:39, col = "black", pch = "-", cex=3)
-ablineclip(v = 33,col = alpha("black",0.7),y1 = min(c(mean_sensi_abs$agpp_fag_syl,mean_sensi_abs$agpp_pic_abi,mean_sensi_abs$agpp_pin_syl,
-                                                      mean_sensi_abs$agpp_mixed))*1.1)
+       x = 34:38, col = "black", pch = "-", cex=3)
+ablineclip(v = 33,col = alpha("black",0.7),y1 = -1)
+ablineclip(v = c(38.5), y1 = -1,y2= 1)
 title(main = "c)", line = 1.7, adj = 0.01, cex.main = 2)
 
 par(mar = c(1.1,4.1,0.1,12.1))
-plot(y = rep(0,39),x=1:39,
+plot(y = rep(0,38),x=1:38,
      ylab = "", xlab = "", xaxt = "n",
      col = c(rep("white",33)),xaxt='n', bty="n", yaxt = 'n', cex.axis =2,
      ylim = c(-0.01,0.01), cex.main = 1.5)
 par(xpd = T)
-text(x = 1:39-0.25, y = 0.01, c(as.character(mean_sensi_parameters$Names),"",as.character(mean_sensi_drivers$Names)),srt = 90,
+text(x = 1:38+0.25, y = 0.01, c(as.character(mean_sensi_parameters$Names),"","co2","prec", "temp","insol", "ndep"),srt = 90,
      adj = c(1,0.), cex =1.5)
 par(xpd = F)
 
