@@ -95,15 +95,7 @@ make_parameter_data_frames <- function(mastersheet, climaticranges, white_parame
   climatic_ranges_site = matrix(ncol = length(climaticranges), nrow = 2)
   rownames(climatic_ranges_site) = c("minimum", "maximum")
   for(i in 1:length(names_climatic)){
-    if(names_climatic[i] == "co2"){
-      climatic_ranges_site[,i] = climaticranges[[i]]
-    }
-    else if(names_climatic[i] == "ph"){
-      climatic_ranges_site[,i] = climaticranges[[i]]
-    }
-    else{
-      climatic_ranges_site[,i] = climaticranges[[i]][,site_id]
-    }
+    climatic_ranges_site[,i] = climaticranges[[i]][2:3,site_id]
   }
 
   colnames(climatic_ranges_site) = paste0("run_", names(climaticranges),"_change")
@@ -302,15 +294,7 @@ make_parameter_data_frames_mixed <- function(mastersheet, climaticranges, white_
   climatic_ranges_site = matrix(ncol = length(climaticranges), nrow = 2)
   rownames(climatic_ranges_site) = c("minimum", "maximum")
   for(i in 1:length(names_climatic)){
-    if(names_climatic[i] == "co2"){
-      climatic_ranges_site[,i] = climaticranges[[i]]
-    }
-    else if(names_climatic[i] == "ph"){
-      climatic_ranges_site[,i] = climaticranges[[i]]
-    }
-    else{
-      climatic_ranges_site[,i] = climaticranges[[i]][,site_id]
-    }
+    climatic_ranges_site[,i] = climaticranges[[i]][2:3,site_id]
   }
 
   colnames(climatic_ranges_site) = paste0("run_", names(climaticranges),"_change")
