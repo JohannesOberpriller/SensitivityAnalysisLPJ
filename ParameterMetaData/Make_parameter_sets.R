@@ -175,6 +175,16 @@ mastersheet <- readRDS("./Templates/mastersheet.rds")
 
 white_parameters_mono = readRDS("./Templates/white_parameters_mono.rds")
 
+dirs = sapply(FUN = function(x){file.path(getwd(),x)}, X = c("parameters",
+                                                             "R_scripts",
+                                                             "submit_scripts",
+                                                             "grids"))
+for(dir in dirs){
+  if(!dir.exists(dir)){
+  dir.create(dir)
+  }
+}
+
 ## generate and save parameters to files
 
 apply(X = mastersheet, FUN = make_parameter_data_frames, climaticranges = climaticranges,
